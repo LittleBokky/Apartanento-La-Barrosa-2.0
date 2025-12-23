@@ -1,0 +1,7 @@
+{
+  "name": "Apartamento La Barrosa - Reserva de Lujo",
+  "description": "Una aplicación web completa para el alquiler vacacional de Apartamento La Barrosa en Chiclana, con gestión de reservas, información detallada de servicios, normas de la casa, experiencias locales y un asistente virtual inteligente basado en Gemini.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
