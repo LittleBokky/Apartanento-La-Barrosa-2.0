@@ -1,16 +1,23 @@
-
-import 'react-day-picker/dist/style.css';
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, addDays, isSameDay } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
 import { DayPicker, DateRange } from 'react-day-picker';
 import { Language } from '../types';
+import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
-const Booking: React.FC<{ lang: Language, blockedDays?: Date[] }> = ({ lang, blockedDays = [] }) => {
+const Booking: React.FC<{
+  lang: Language,
+  blockedDays?: Date[],
+  user?: any,
+  onBookingSuccess?: () => void
+}> = ({ lang, blockedDays = [], user, onBookingSuccess }) => {
   const [range, setRange] = useState<DateRange | undefined>();
   const [adults, setAdults] = useState(2);
   const [kids, setKids] = useState(0);
   const [priceDetails, setPriceDetails] = useState({ total: 0, nights: 0, avgPrice: 0 });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   // Pricing Logic
   const getPriceForDate = (date: Date) => {
@@ -52,6 +59,68 @@ const Booking: React.FC<{ lang: Language, blockedDays?: Date[] }> = ({ lang, blo
       setPriceDetails({ total: 0, nights: 0, avgPrice: 0 });
     }
   }, [range, adults, kids]);
+
+  const handleBookingConfirm = async () => {
+    if (!user) {
+      alert(lang === 'es' ? 'Debes iniciar sesión para reservar.' : 'You must log in to book.');
+      navigate('/login');
+      return;
+    }
+
+    if (!range?.from || !range?.to) return;
+
+    // Overlap check
+    const isDateBlocked = (date: Date) => {
+      return blockedDays.some(blockedDate => isSameDay(blockedDate, date));
+    };
+
+    let checkDate = range.from;
+    while (checkDate <= range.to) {
+      if (isDateBlocked(checkDate)) {
+        alert(lang === 'es' ? 'Lo sentimos, algunas de las fechas seleccionadas ya no están disponibles.' : 'Sorry, some of the selected dates are no longer available.');
+        setIsSubmitting(false);
+        return;
+      }
+      checkDate = addDays(checkDate, 1);
+    }
+
+    setIsSubmitting(true);
+
+    const check_in = format(range.from, 'yyyy-MM-dd');
+    const check_out = format(range.to, 'yyyy-MM-dd');
+
+    // Final price calculation (matching the UI)
+    const CLEANING_FEE = 45;
+    const DISCOUNT = 0.05;
+    const finalTotal = priceDetails.total + CLEANING_FEE;
+    const discountedTotal = finalTotal * (1 - DISCOUNT);
+
+    const { error } = await supabase.from('bookings').insert({
+      user_id: user.id || (await supabase.auth.getUser()).data.user?.id,
+      guest_name: user.name,
+      guest_email: user.email,
+      check_in,
+      check_out,
+      guests_adults: adults,
+      guests_children: kids,
+      total_price: Math.round(discountedTotal),
+      status: 'confirmed'
+    });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error('Booking error:', error);
+      alert(lang === 'es'
+        ? `Error al crear la reserva: ${error.message}`
+        : `Error creating booking: ${error.message}`);
+      return;
+    }
+
+    alert(lang === 'es' ? '¡Reserva confirmada con éxito!' : 'Booking confirmed successfully!');
+    onBookingSuccess?.();
+    navigate('/profile');
+  };
 
   const t = {
     es: {
@@ -243,10 +312,15 @@ const Booking: React.FC<{ lang: Language, blockedDays?: Date[] }> = ({ lang, blo
                 )}
 
                 <button
-                  disabled={!range?.from || !range?.to}
-                  className="w-full h-16 bg-primary disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
+                  onClick={handleBookingConfirm}
+                  disabled={!range?.from || !range?.to || isSubmitting}
+                  className="w-full h-16 bg-primary disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
-                  {t.confirm}
+                  {isSubmitting ? (
+                    <span className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  ) : (
+                    t.confirm
+                  )}
                 </button>
                 <p className="text-center text-[10px] text-text-muted mt-6 flex items-center justify-center gap-1.5">
                   <span className="material-symbols-outlined !text-sm text-green-500">verified_user</span>

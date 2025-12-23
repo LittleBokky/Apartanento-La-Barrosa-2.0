@@ -1,13 +1,64 @@
-
 import React, { useState } from 'react';
 import { Language } from '../types';
+import { supabase } from '../lib/supabase';
 
 const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: lang === 'es' ? 'Consulta general' : 'General Inquiry',
+    message: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    // 1. Guardar en Supabase (para el panel interno)
+    const { error: supabaseError } = await supabase.from('contact_messages').insert([
+      {
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      }
+    ]);
+
+    // 2. Enviar a Formspree (para notificación por email)
+    try {
+      const response = await fetch('https://formspree.io/f/mnjawval', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        console.error('Formspree error:', await response.text());
+      }
+    } catch (err) {
+      console.error('Formspree fetch failed:', err);
+    }
+
+    setIsSubmitting(false);
+
+    if (supabaseError) {
+      alert(lang === 'es' ? 'Error al enviar el mensaje' : 'Error sending message');
+      console.error(supabaseError);
+      return;
+    }
+
     setSent(true);
+    setFormData({
+      name: '',
+      email: '',
+      subject: lang === 'es' ? 'Consulta general' : 'General Inquiry',
+      message: ''
+    });
     setTimeout(() => setSent(false), 5000);
   };
 
@@ -58,24 +109,46 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-bold">{t.name}</label>
-                <input required type="text" className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20" />
+                <input
+                  required
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20"
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold">{t.email}</label>
-                <input required type="email" className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20" />
+                <input
+                  required
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20"
+                />
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold">{t.subject}</label>
-              <select className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20">
-                <option>{lang === 'es' ? 'Consulta general' : 'General Inquiry'}</option>
-                <option>{lang === 'es' ? 'Reserva' : 'Booking'}</option>
-                <option>{lang === 'es' ? 'Problema técnico' : 'Technical Issue'}</option>
+              <select
+                value={formData.subject}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20"
+              >
+                <option value={lang === 'es' ? 'Consulta general' : 'General Inquiry'}>{lang === 'es' ? 'Consulta general' : 'General Inquiry'}</option>
+                <option value={lang === 'es' ? 'Reserva' : 'Booking'}>{lang === 'es' ? 'Reserva' : 'Booking'}</option>
+                <option value={lang === 'es' ? 'Problema técnico' : 'Technical Issue'}>{lang === 'es' ? 'Problema técnico' : 'Technical Issue'}</option>
               </select>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold">{t.msg}</label>
-              <textarea required rows={4} className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl p-5 focus:ring-2 focus:ring-primary/20 resize-none"></textarea>
+              <textarea
+                required
+                rows={4}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl p-5 focus:ring-2 focus:ring-primary/20 resize-none"
+              ></textarea>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
@@ -83,8 +156,14 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
                 <span className="material-symbols-outlined text-green-500 !text-sm">check_circle</span>
                 {lang === 'es' ? 'Respuesta en menos de 24h' : 'Reply in less than 24h'}
               </p>
-              <button disabled={sent} type="submit" className="w-full md:w-auto h-14 px-10 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:bg-green-500">
-                {sent ? (
+              <button
+                disabled={sent || isSubmitting}
+                type="submit"
+                className="w-full md:w-auto h-14 px-10 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:bg-green-500 disabled:opacity-70"
+              >
+                {isSubmitting ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : sent ? (
                   <><span className="material-symbols-outlined">check</span> {t.success}</>
                 ) : (
                   <>{t.send} <span className="material-symbols-outlined text-sm">send</span></>

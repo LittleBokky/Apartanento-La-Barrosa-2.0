@@ -1,81 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import { Link } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
 import { es, enUS } from 'date-fns/locale';
 import 'react-day-picker/dist/style.css';
+import { supabase } from '../lib/supabase';
 
 interface Booking {
     id: string;
-    dates: string;
-    guests: string;
-    price: string;
-    status: 'upcoming' | 'completed' | 'cancelled';
-    image: string;
-    email?: string; // Optional for admin view
+    check_in: string;
+    check_out: string;
+    guests_adults: number;
+    guests_children: number;
+    total_price: number;
+    status: 'confirmed' | 'completed' | 'cancelled';
+    guest_name?: string;
+    guest_email?: string;
 }
 
-const MOCK_BOOKINGS: Booking[] = [
-    {
-        id: "RES-2025-001",
-        dates: "12 Jul - 19 Jul 2025",
-        guests: "2 Adultos",
-        price: "€1.042,00",
-        status: 'upcoming',
-        image: '/images/apartment/terrace.jpg'
-    },
-    {
-        id: "RES-2024-893",
-        dates: "15 Ago - 22 Ago 2024",
-        guests: "2 Adultos, 1 Niño",
-        price: "€1.250,00",
-        status: 'completed',
-        image: '/images/apartment/living_room.jpg'
-    }
-];
+interface Message {
+    id: string;
+    created_at: string;
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+}
 
-const ADMIN_BOOKINGS: Booking[] = [
-    {
-        id: "RES-2025-001",
-        dates: "12 Jul - 19 Jul 2025",
-        guests: "2 Adultos",
-        price: "€1.042,00",
-        status: 'upcoming',
-        image: '/images/apartment/terrace.jpg',
-        email: 'cliente1@email.com'
-    },
-    {
-        id: "RES-2025-015",
-        dates: "1 Ago - 7 Ago 2025",
-        guests: "4 Adultos",
-        price: "€1.420,00",
-        status: 'upcoming',
-        image: '/images/apartment/kitchen.jpg',
-        email: 'familia.perez@email.com'
-    },
-    {
-        id: "RES-2024-893",
-        dates: "15 Ago - 22 Ago 2024",
-        guests: "2 Adultos, 1 Niño",
-        price: "€1.250,00",
-        status: 'completed',
-        image: '/images/apartment/living_room.jpg',
-        email: 'juan.garcia@email.com'
-    },
-    {
-        id: "RES-2024-840",
-        dates: "1 Jul - 5 Jul 2024",
-        guests: "2 Adultos",
-        price: "€850,00",
-        status: 'completed',
-        image: '/images/apartment/bedroom_tv.jpg',
-        email: 'ana.lopez@email.com'
-    }
-];
-
-const Profile: React.FC<{ lang: Language, user: any, onLogout: () => void }> = ({ lang, user, onLogout }) => {
+const Profile: React.FC<{
+    lang: Language,
+    user: any,
+    onLogout: () => void,
+    blockedDays?: Date[],
+    setBlockedDays?: (days: Date[] | undefined) => void,
+    onRefresh?: () => void
+}> = ({ lang, user, onLogout, blockedDays = [], setBlockedDays, onRefresh }) => {
     const isAdmin = user?.role === 'admin';
-    const [blockedDays, setBlockedDays] = useState<Date[] | undefined>([]);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchBookings = async () => {
+        setIsLoading(true);
+        let query = supabase.from('bookings').select('*');
+        if (!isAdmin) query = query.eq('user_id', user.id);
+        const { data, error } = await query.order('check_in', { ascending: false });
+        if (error) console.error('Error fetching bookings:', error);
+        else setBookings(data || []);
+        setIsLoading(false);
+    };
+
+    const fetchMessages = async () => {
+        if (!isAdmin) return;
+        const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+        if (error) console.error('Error fetching messages:', error);
+        else setMessages(data || []);
+    };
+
+    const handleDeleteBooking = async (id: string) => {
+        if (!window.confirm(lang === 'es' ? '¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.' : 'Are you sure you want to delete this booking? This action cannot be undone.')) {
+            return;
+        }
+
+        const { error } = await supabase.from('bookings').delete().eq('id', id);
+
+        if (error) {
+            alert(lang === 'es' ? 'Error al eliminar la reserva' : 'Error deleting booking');
+            console.error(error);
+        } else {
+            fetchBookings();
+            onRefresh?.();
+        }
+    };
+
+    const handleDeleteMessage = async (id: string) => {
+        if (!window.confirm(lang === 'es' ? '¿Borrar este mensaje?' : 'Delete this message?')) return;
+        const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+        if (error) console.error(error);
+        else fetchMessages();
+    };
+
+    useEffect(() => {
+        if (user && user.id) {
+            fetchBookings();
+            if (isAdmin) fetchMessages();
+        }
+    }, [user?.id, isAdmin]);
 
     const t = {
         es: {
@@ -84,19 +94,23 @@ const Profile: React.FC<{ lang: Language, user: any, onLogout: () => void }> = (
             email: user?.email,
             logout: "Cerrar Sesión",
             myBookings: isAdmin ? "Gestión de Reservas" : "Mis Reservas",
+            messages: "Mensajes de Contacto",
+            noMessages: "No hay mensajes nuevos.",
             upcoming: "Próximas",
             history: "Historial",
-            noBookings: "No tienes reservas activas.",
+            noBookings: "No hay reservas registradas.",
             status: {
-                upcoming: "Confirmada",
+                confirmed: "Confirmada",
                 completed: "Finalizada",
                 cancelled: "Cancelada"
             },
             bookAgain: "Reservar de nuevo",
             guest: "Huésped",
             manageCalendar: "Gestionar Disponibilidad",
-            clickToBlock: "Haz clic en los días para bloquear/desbloquear su disponibilidad.",
-            blocked: "Bloqueado"
+            clickToBlock: "Haz clic en los días para bloquear/desbloquear su disponibilidad manualmente.",
+            blocked: "Bloqueado",
+            loading: "Cargando reservas...",
+            delete: "Eliminar"
         },
         en: {
             title: "My Profile",
@@ -104,23 +118,25 @@ const Profile: React.FC<{ lang: Language, user: any, onLogout: () => void }> = (
             email: user?.email,
             logout: "Sign Out",
             myBookings: isAdmin ? "Manage Bookings" : "My Bookings",
+            messages: "Contact Messages",
+            noMessages: "No new messages.",
             upcoming: "Upcoming",
             history: "History",
-            noBookings: "You have no active bookings.",
+            noBookings: "No bookings found.",
             status: {
-                upcoming: "Confirmed",
+                confirmed: "Confirmed",
                 completed: "Completed",
                 cancelled: "Cancelled"
             },
             bookAgain: "Book again",
             guest: "Guest",
             manageCalendar: "Manage Availability",
-            clickToBlock: "Click on days to block/unblock their availability.",
-            blocked: "Blocked"
+            clickToBlock: "Click on days to manually block/unblock their availability.",
+            blocked: "Blocked",
+            loading: "Loading bookings...",
+            delete: "Delete"
         }
     }[lang];
-
-    const bookingsToShow = isAdmin ? ADMIN_BOOKINGS : MOCK_BOOKINGS;
 
     return (
         <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 animate-fade-in-up">
@@ -190,44 +206,59 @@ const Profile: React.FC<{ lang: Language, user: any, onLogout: () => void }> = (
                         </h3>
 
                         <div className="space-y-6">
-                            {bookingsToShow.map((booking) => (
+                            {isLoading ? (
+                                <p className="text-center py-10 text-text-muted animate-pulse">{t.loading}</p>
+                            ) : bookings.length === 0 ? (
+                                <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
+                                    <span className="material-symbols-outlined text-4xl text-gray-300 mb-2">event_busy</span>
+                                    <p className="text-text-muted">{t.noBookings}</p>
+                                </div>
+                            ) : bookings.map((booking) => (
                                 <div key={booking.id} className="bg-white dark:bg-surface-dark rounded-3xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center group hover:shadow-lg transition-all">
-                                    <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shrink-0 relative">
-                                        <img src={booking.image} alt="Apartment" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                        {isAdmin && (
-                                            <div className="absolute top-2 left-2 size-8 bg-white/90 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center shadow-sm">
-                                                <span className="material-symbols-outlined text-sm">person</span>
-                                            </div>
-                                        )}
+                                    <div className="w-full md:w-32 h-24 rounded-2xl overflow-hidden shrink-0 relative bg-primary/5 flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-primary text-3xl">hotel</span>
                                     </div>
 
                                     <div className="flex-grow space-y-2">
                                         <div className="flex justify-between items-start">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${booking.status === 'upcoming' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                    booking.status === 'completed' ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' : 'bg-red-100 text-red-600'
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                booking.status === 'completed' ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' : 'bg-red-100 text-red-600'
                                                 }`}>
-                                                {t.status[booking.status]}
+                                                {t.status[booking.status] || booking.status}
                                             </span>
-                                            <span className="text-xs text-text-muted font-mono">{booking.id}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] text-text-muted font-mono bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">ID: {booking.id.slice(0, 8)}</span>
+                                                {isAdmin && (
+                                                    <button
+                                                        onClick={() => handleDeleteBooking(booking.id)}
+                                                        className="text-red-500 hover:text-red-700 p-1 transition-colors"
+                                                        title={t.delete}
+                                                    >
+                                                        <span className="material-symbols-outlined text-sm">delete</span>
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        {isAdmin && booking.email ? (
+                                        {isAdmin ? (
                                             <div className="flex flex-col">
-                                                <h4 className="text-lg font-bold text-gray-900 dark:text-white">{booking.email}</h4>
-                                                <span className="text-xs font-bold text-text-muted uppercase tracking-wide">{t.guest}</span>
+                                                <h4 className="text-lg font-bold text-gray-900 dark:text-white">
+                                                    {booking.guest_name || 'Huésped desconocido'}
+                                                </h4>
+                                                <p className="text-sm text-primary font-medium">{booking.guest_email}</p>
                                             </div>
                                         ) : (
                                             <h4 className="text-lg font-bold">Apartamento La Barrosa</h4>
                                         )}
 
                                         <div className="flex flex-wrap gap-4 text-sm text-text-muted dark:text-gray-400 mt-1">
-                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">event</span> {booking.dates}</span>
-                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">group</span> {booking.guests}</span>
+                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">event</span> {booking.check_in} - {booking.check_out}</span>
+                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">group</span> {booking.guests_adults} Adultos, {booking.guests_children} Niños</span>
                                         </div>
                                     </div>
 
                                     <div className="w-full md:w-auto text-right space-y-3">
-                                        <p className="text-xl font-black text-primary">{booking.price}</p>
+                                        <p className="text-xl font-black text-primary">€{booking.total_price}</p>
                                         {!isAdmin && booking.status === 'completed' && (
                                             <Link to="/booking" className="inline-block px-5 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm font-bold transition-colors">
                                                 {t.bookAgain}
@@ -238,6 +269,49 @@ const Profile: React.FC<{ lang: Language, user: any, onLogout: () => void }> = (
                             ))}
                         </div>
                     </div>
+
+                    {/* Admin Contact Messages */}
+                    {isAdmin && (
+                        <div>
+                            <h3 className="text-2xl font-black mb-6 flex items-center gap-3">
+                                <span className="material-symbols-outlined text-purple-600">mail</span>
+                                {t.messages}
+                            </h3>
+
+                            <div className="space-y-6">
+                                {messages.length === 0 ? (
+                                    <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
+                                        <span className="material-symbols-outlined text-4xl text-gray-300 mb-2">drafts</span>
+                                        <p className="text-text-muted">{t.noMessages}</p>
+                                    </div>
+                                ) : messages.map((msg) => (
+                                    <div key={msg.id} className="bg-white dark:bg-surface-dark rounded-3xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 hover:shadow-lg transition-all">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h4 className="text-lg font-bold">{msg.name}</h4>
+                                                <p className="text-sm text-primary font-medium">{msg.email}</p>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] text-text-muted bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                                                    {new Date(msg.created_at).toLocaleDateString()}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleDeleteMessage(msg.id)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">delete</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-2xl">
+                                            <p className="text-xs font-black uppercase text-text-muted mb-2 tracking-wider">{msg.subject}</p>
+                                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">{msg.message}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

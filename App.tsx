@@ -226,6 +226,8 @@ const Footer: React.FC<{ lang: Language }> = ({ lang }) => {
   );
 };
 
+import { supabase } from './lib/supabase';
+
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('es');
   const [isDark, setIsDark] = useState(() => {
@@ -244,22 +246,136 @@ const App: React.FC = () => {
     }
   }, [isDark]);
 
+  const fetchBlockedDays = async () => {
+    // 1. Fetch manual blocks
+    const { data: manualData, error: manualError } = await supabase.from('blocked_dates').select('date');
+
+    // 2. Fetch occupied dates from bookings
+    const { data: bookingData, error: bookingError } = await supabase.from('bookings').select('check_in, check_out').eq('status', 'confirmed');
+
+    if (manualError || bookingError) {
+      console.error('Error fetching dates:', manualError || bookingError);
+      return;
+    }
+
+    const allBlocked = new Set<string>();
+
+    // Add manual dates
+    manualData?.forEach((row: any) => allBlocked.add(row.date));
+
+    // Add booking dates (range)
+    bookingData?.forEach((booking: any) => {
+      const [sy, sm, sd] = booking.check_in.split('-').map(Number);
+      const [ey, em, ed] = booking.check_out.split('-').map(Number);
+      let current = new Date(sy, sm - 1, sd);
+      const end = new Date(ey, em - 1, ed);
+
+      while (current <= end) {
+        const year = current.getFullYear();
+        const month = String(current.getMonth() + 1).padStart(2, '0');
+        const day = String(current.getDate()).padStart(2, '0');
+        allBlocked.add(`${year}-${month}-${day}`);
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    const combinedDates = Array.from(allBlocked).map(dateStr => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    });
+
+    setBlockedDays(combinedDates);
+  };
+
   useEffect(() => {
+    // Initial user load from localStorage
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    // Immediate session check to ensure ID and session are valid
+    const syncSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const isAdmin = session.user.email === 'apartamentoplayalabarrosa16@gmail.com';
+        const userData = {
+          id: session.user.id,
+          name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'Usuario',
+          email: session.user.email,
+          role: isAdmin ? 'admin' : 'user'
+        };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+      }
+    };
+    syncSession();
+
+    // Supabase Auth Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        const isAdmin = session.user.email === 'apartamentoplayalabarrosa16@gmail.com';
+        const userData = {
+          id: session.user.id,
+          name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'Usuario',
+          email: session.user.email,
+          role: isAdmin ? 'admin' : 'user'
+        };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        if (isAdmin) localStorage.setItem('isAdmin', 'true');
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAdmin');
+      }
+    });
+
+    fetchBlockedDays();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const handleBlockedDaysUpdate = async (newDays: Date[] | undefined) => {
+    if (!newDays) return;
+
+    // Optimistic update
+    const oldDays = blockedDays;
+    setBlockedDays(newDays);
+
+    const toDateStr = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const oldDates = oldDays.map(toDateStr);
+    const newDates = newDays.map(toDateStr);
+
+    const toAdd = newDates.filter(d => !oldDates.includes(d));
+    const toRemove = oldDates.filter(d => !newDates.includes(d));
+
+    if (toAdd.length > 0) {
+      const { error } = await supabase.from('blocked_dates').insert(toAdd.map(date => ({ date })));
+      if (error) console.error('Error adding dates:', error);
+    }
+
+    if (toRemove.length > 0) {
+      const { error } = await supabase.from('blocked_dates').delete().in('date', toRemove);
+      if (error) console.error('Error removing dates:', error);
+    }
+  };
 
   const handleLogin = (userData: any) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAdmin');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     window.location.href = '/';
   };
 
@@ -277,10 +393,10 @@ const App: React.FC = () => {
             <Route path="/experiences" element={<Experiences lang={lang} />} />
             <Route path="/rules" element={<Rules lang={lang} />} />
             <Route path="/contact" element={<Contact lang={lang} />} />
-            <Route path="/booking" element={<Booking lang={lang} blockedDays={blockedDays} />} />
+            <Route path="/booking" element={<Booking lang={lang} blockedDays={blockedDays} user={user} onBookingSuccess={fetchBlockedDays} />} />
             <Route path="/login" element={<Login lang={lang} onLogin={handleLogin} />} />
             <Route path="/register" element={<Register lang={lang} />} />
-            <Route path="/profile" element={<Profile lang={lang} user={user} onLogout={handleLogout} blockedDays={blockedDays} setBlockedDays={setBlockedDays} />} />
+            <Route path="/profile" element={<Profile lang={lang} user={user} onLogout={handleLogout} blockedDays={blockedDays} setBlockedDays={handleBlockedDaysUpdate} onRefresh={fetchBlockedDays} />} />
           </Routes>
         </main>
 
