@@ -1,18 +1,20 @@
-
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Language, NavItem, BookingDetails } from './types';
 import { NAV_ITEMS } from './constants';
 import { ConciergeAI } from './components/ConciergeAI';
 
 // Views
 import Home from './views/Home';
-import Apartment from './views/Apartment'; // Cambiado de Nature a Apartment
+import Apartment from './views/Apartment';
 import Services from './views/Services';
 import Rules from './views/Rules';
 import Experiences from './views/Experiences';
 import Contact from './views/Contact';
 import Booking from './views/Booking';
+import Login from './views/Login';
+import Register from './views/Register';
+import Profile from './views/Profile';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -20,7 +22,14 @@ const ScrollToTop = () => {
   return null;
 };
 
-const Navbar: React.FC<{ lang: Language, setLang: (l: Language) => void, isDark: boolean, setIsDark: (d: boolean) => void }> = ({ lang, setLang, isDark, setIsDark }) => {
+const Navbar: React.FC<{
+  lang: Language,
+  setLang: (l: Language) => void,
+  isDark: boolean,
+  setIsDark: (d: boolean) => void,
+  user: any,
+  onLogout: () => void
+}> = ({ lang, setLang, isDark, setIsDark, user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -36,12 +45,11 @@ const Navbar: React.FC<{ lang: Language, setLang: (l: Language) => void, isDark:
 
         <nav className="hidden lg:flex items-center gap-8">
           {NAV_ITEMS.map((item) => (
-            <Link 
-              key={item.id} 
+            <Link
+              key={item.id}
               to={item.path}
-              className={`text-sm font-semibold transition-colors ${
-                location.pathname === item.path ? 'text-primary' : 'text-text-main dark:text-gray-300 hover:text-primary'
-              }`}
+              className={`text-sm font-semibold transition-colors ${location.pathname === item.path ? 'text-primary' : 'text-text-main dark:text-gray-300 hover:text-primary'
+                }`}
             >
               {item.label[lang]}
             </Link>
@@ -49,25 +57,40 @@ const Navbar: React.FC<{ lang: Language, setLang: (l: Language) => void, isDark:
         </nav>
 
         <div className="flex items-center gap-3">
+          {/* User Section */}
+          {user ? (
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="relative group">
+                <Link to="/profile" className="flex items-center justify-center size-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all font-bold">
+                  {user.name.charAt(0).toUpperCase()}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <Link to="/login" className="hidden sm:flex size-10 items-center justify-center rounded-lg text-text-muted hover:text-primary hover:bg-primary/5 transition-all">
+              <span className="material-symbols-outlined">account_circle</span>
+            </Link>
+          )}
+
           <div className="hidden sm:flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <button 
+            <button
               onClick={() => setLang('es')}
               className={`px-3 py-1 rounded text-xs font-bold transition-all ${lang === 'es' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'text-text-muted hover:text-text-main'}`}
             >ES</button>
-            <button 
+            <button
               onClick={() => setLang('en')}
               className={`px-3 py-1 rounded text-xs font-bold transition-all ${lang === 'en' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'text-text-muted hover:text-text-main'}`}
             >EN</button>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setIsDark(!isDark)}
             className="size-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <span className="material-symbols-outlined">{isDark ? 'light_mode' : 'dark_mode'}</span>
           </button>
 
-          <Link 
+          <Link
             to="/booking"
             className="hidden sm:flex h-10 px-5 items-center justify-center rounded-lg bg-primary text-white text-sm font-bold shadow-md hover:bg-primary-dark transition-all active:scale-95"
           >
@@ -84,9 +107,21 @@ const Navbar: React.FC<{ lang: Language, setLang: (l: Language) => void, isDark:
       {isMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-background-dark border-b border-gray-100 dark:border-gray-800 px-4 py-6 animate-fade-in-up">
           <div className="flex flex-col gap-4">
+            {user && (
+              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl mb-2">
+                <div className="size-10 bg-primary text-white rounded-full flex items-center justify-center text-lg font-bold">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-bold">{user.name}</p>
+                  <p className="text-xs text-text-muted">{user.email}</p>
+                </div>
+              </div>
+            )}
+
             {NAV_ITEMS.map((item) => (
-              <Link 
-                key={item.id} 
+              <Link
+                key={item.id}
                 to={item.path}
                 onClick={() => setIsMenuOpen(false)}
                 className="text-base font-bold text-text-main dark:text-white"
@@ -94,6 +129,26 @@ const Navbar: React.FC<{ lang: Language, setLang: (l: Language) => void, isDark:
                 {item.label[lang]}
               </Link>
             ))}
+
+            <div className="py-2 border-t border-gray-100 dark:border-gray-800 my-2">
+              {user ? (
+                <>
+                  <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-text-main dark:text-white font-bold py-2">
+                    <span className="material-symbols-outlined">person</span>
+                    {lang === 'es' ? 'Mi Perfil' : 'My Profile'}
+                  </Link>
+                  <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="flex items-center gap-3 text-red-500 font-bold py-2 w-full text-left">
+                    <span className="material-symbols-outlined">logout</span>
+                    {lang === 'es' ? 'Cerrar Sesión' : 'Sign Out'}
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-text-main dark:text-white font-bold py-2">
+                  <span className="material-symbols-outlined">login</span>
+                  {lang === 'es' ? 'Iniciar Sesión' : 'Sign In'}
+                </Link>
+              )}
+            </div>
             <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="h-12 w-full flex items-center justify-center bg-primary text-white rounded-lg font-bold">
               {lang === 'es' ? 'Reservar Ahora' : 'Book Now'}
             </Link>
@@ -115,8 +170,8 @@ const Footer: React.FC<{ lang: Language }> = ({ lang }) => {
               <span className="text-xl font-black">La Barrosa</span>
             </div>
             <p className="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
-              {lang === 'es' 
-                ? 'Tu hogar lejos de casa en la Costa de la Luz. Disfruta de una experiencia única con todas las comodidades.' 
+              {lang === 'es'
+                ? 'Tu hogar lejos de casa en la Costa de la Luz. Disfruta de una experiencia única con todas las comodidades.'
                 : 'Your home away from home in Costa de la Luz. Enjoy a unique experience with all the comforts.'}
             </p>
             <div className="flex gap-4">
@@ -176,6 +231,8 @@ const App: React.FC = () => {
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  const [user, setUser] = useState<any>(null);
+  const [blockedDays, setBlockedDays] = useState<Date[]>([]);
 
   useEffect(() => {
     if (isDark) {
@@ -187,12 +244,31 @@ const App: React.FC = () => {
     }
   }, [isDark]);
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogin = (userData: any) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAdmin');
+    window.location.href = '/';
+  };
+
   return (
     <Router>
       <ScrollToTop />
       <div className="min-h-screen flex flex-col font-display selection:bg-primary/30">
-        <Navbar lang={lang} setLang={setLang} isDark={isDark} setIsDark={setIsDark} />
-        
+        <Navbar lang={lang} setLang={setLang} isDark={isDark} setIsDark={setIsDark} user={user} onLogout={handleLogout} />
+
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home lang={lang} />} />
@@ -201,9 +277,13 @@ const App: React.FC = () => {
             <Route path="/experiences" element={<Experiences lang={lang} />} />
             <Route path="/rules" element={<Rules lang={lang} />} />
             <Route path="/contact" element={<Contact lang={lang} />} />
-            <Route path="/booking" element={<Booking lang={lang} />} />
+            <Route path="/booking" element={<Booking lang={lang} blockedDays={blockedDays} />} />
+            <Route path="/login" element={<Login lang={lang} onLogin={handleLogin} />} />
+            <Route path="/register" element={<Register lang={lang} />} />
+            <Route path="/profile" element={<Profile lang={lang} user={user} onLogout={handleLogout} blockedDays={blockedDays} setBlockedDays={setBlockedDays} />} />
           </Routes>
         </main>
+
 
         <Footer lang={lang} />
         <ConciergeAI lang={lang} />

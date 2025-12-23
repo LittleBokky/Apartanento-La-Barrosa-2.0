@@ -77,7 +77,7 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
               <label className="text-sm font-bold">{t.msg}</label>
               <textarea required rows={4} className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl p-5 focus:ring-2 focus:ring-primary/20 resize-none"></textarea>
             </div>
-            
+
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
               <p className="text-xs text-text-muted flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-green-500 !text-sm">check_circle</span>
@@ -102,7 +102,7 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
               </div>
               <div>
                 <h4 className="font-bold mb-1">{t.address}</h4>
-                <p className="text-sm text-text-muted dark:text-gray-400">Calle La Barrosa, 12, 11130<br/>Chiclana, Cádiz, España</p>
+                <p className="text-sm text-text-muted dark:text-gray-400">Av. de los Pescadores, 16, 11139<br />Chiclana de la Frontera, Cádiz</p>
               </div>
             </div>
             <div className="flex gap-6">
@@ -111,23 +111,27 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
               </div>
               <div>
                 <h4 className="font-bold mb-1">{t.phone}</h4>
-                <p className="text-sm text-text-muted dark:text-gray-400">+34 956 123 456</p>
+                <p className="text-sm text-text-muted dark:text-gray-400">+34 601 26 04 80</p>
                 <p className="text-[10px] text-primary font-bold uppercase mt-1">WhatsApp Disponible</p>
               </div>
             </div>
           </div>
 
-          <div className="relative h-[350px] rounded-3xl overflow-hidden shadow-2xl group">
-             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLCiaQH--eWCASRa3bMVrhXQFUkJi-IPFzl4XvLlJ7pVr5QnpxZ5oBGUi5mxnQBr0XtVnWoRyvmzCf26wYTn94xNmdXi5s7U_kAUbZz_wvqs8sirt2SCM13EqjfV43vVlBYMh1VrAHHdIfent38tRFXwXeNuxFMB4zpCN0XvH1RXP5vb0kNLqFCloTkAWZWSRM43nuHyofJhqjvLLhObYe21axumWljIXGLauim47hOXyp1wdztTAQDNChc94egTKzN3rGa3JPg224" className="w-full h-full object-cover" alt="Map" />
-             <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-all pointer-events-none"></div>
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-               <span className="material-symbols-outlined text-primary text-6xl drop-shadow-2xl animate-bounce">location_on</span>
-               <div className="bg-white dark:bg-gray-900 px-4 py-2 rounded-xl shadow-2xl text-xs font-black uppercase tracking-widest mt-2">{t.findUs}</div>
-             </div>
-             <button className="absolute bottom-6 left-6 bg-white dark:bg-gray-900 text-sm font-bold py-3 px-5 rounded-xl shadow-2xl flex items-center gap-2 hover:bg-gray-50 transition-colors">
-               <span className="material-symbols-outlined text-primary">map</span>
-               {t.googleMaps}
-             </button>
+          <div className="relative h-[350px] rounded-3xl overflow-hidden shadow-2xl group border border-gray-100 dark:border-gray-800">
+            <iframe
+              width="100%"
+              height="100%"
+              id="gmap_canvas"
+              src="https://maps.google.com/maps?q=Av.%20de%20los%20Pescadores%2C%2016%2C%2011139%20Chiclana%20de%20la%20Frontera%2C%20C%C3%A1diz&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              frameBorder="0"
+              scrolling="no"
+              className="grayscale group-hover:grayscale-0 transition-all duration-700"
+              title="Ubicación Apartamento"
+            ></iframe>
+            <a href="https://maps.app.goo.gl/RJ8nCBqYqqz6q4Qk8" target="_blank" rel="noopener noreferrer" className="absolute bottom-6 left-6 bg-white dark:bg-gray-900 text-sm font-bold py-3 px-5 rounded-xl shadow-2xl flex items-center gap-2 hover:bg-gray-50 transition-colors">
+              <span className="material-symbols-outlined text-primary">map</span>
+              {t.googleMaps}
+            </a>
           </div>
         </div>
       </div>

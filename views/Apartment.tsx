@@ -31,7 +31,52 @@ const APARTMENT_PHOTOS = [
     url: '/images/apartment/terrace.jpg',
     title: { es: 'Terraza Privada', en: 'Private Terrace' }
   },
+  {
+    url: '/images/apartment/gallery_extra_1.jpg',
+    title: { es: 'Entorno Natural', en: 'Natural Surroundings' }
+  },
+  {
+    url: '/images/apartment/gallery_extra_2.jpg',
+    title: { es: 'Zonas Comunes', en: 'Common Areas' }
+  },
 ];
+
+const REVIEWS = [
+  {
+    author: "Mariluz P.",
+    rating: 5,
+    date: { es: "Hace 7 meses", en: "7 months ago" },
+    text: {
+      es: "Cogimos el apartamento para el fin de semana y ha sido una estancia genial. Antonio es un gran anfitrión, preocupado en todo momento porque no nos faltase de nada...",
+      en: "We booked the apartment for the weekend and had a great stay. Antonio is a great host, ensuring at all times that we had everything we needed..."
+    }
+  },
+  {
+    author: "Carla Guerrero",
+    rating: 5,
+    date: { es: "Hace 5 meses", en: "5 months ago" },
+    text: {
+      es: "Es el segundo año que alquilo el apartamento de Antonio en Chiclana y, como siempre, todo perfecto. Cómodo, limpio y bien ubicado. Antonio es muy buen anfitrión, repetiremos seguro!",
+      en: "This is the second year I've rented Antonio's apartment in Chiclana and, as always, everything was perfect. Comfortable, clean, and well-located. Antonio is a very good host, we will definitely return!"
+    }
+  },
+  {
+    author: "Ana Herrero",
+    rating: 5,
+    date: { es: "Hace 2 años", en: "2 years ago" },
+    text: {
+      es: "Alojamiento muy cómodo, completo y cuidando hasta el más mínimo detalle. Limpieza y orden exquisitos...",
+      en: "Very comfortable accommodation, complete and taking care of even the smallest detail. Exquisite cleanliness and order..."
+    }
+  }
+];
+
+const LOCATION_DATA = {
+  address: "Av. de los Pescadores, 16, 11139 Chiclana de la Frontera, Cádiz, España",
+  link: "https://share.google/5zMiwCH1MPPcNr0Qf",
+  rating: 5.0,
+  totalReviews: 56
+};
 
 const Apartment: React.FC<{ lang: Language }> = ({ lang }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -182,6 +227,96 @@ const Apartment: React.FC<{ lang: Language }> = ({ lang }) => {
             <button className="mt-10 w-full h-14 bg-primary text-white font-bold rounded-2xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
               {lang === 'es' ? 'Ver Disponibilidad' : 'Check Availability'}
             </button>
+          </div>
+        </div>
+
+        {/* Full Gallery Grid */}
+        <div className="mb-20 mt-16">
+          <h2 className="text-3xl font-black mb-10 text-center">{lang === 'es' ? 'Galería Completa' : 'Full Gallery'}</h2>
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            {APARTMENT_PHOTOS.map((photo, i) => (
+              <div key={i} className="break-inside-avoid rounded-3xl overflow-hidden group relative shadow-lg">
+                <img
+                  src={photo.url}
+                  alt={photo.title[lang]}
+                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <p className="text-white font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{photo.title[lang]}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-24 mb-20">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex items-center gap-1 bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 px-4 py-2 rounded-full border border-yellow-400/20">
+              <span className="material-symbols-outlined text-sm icon-filled">star</span>
+              <span className="font-bold text-sm">{LOCATION_DATA.rating}</span>
+            </div>
+            <h2 className="text-3xl font-black">{lang === 'es' ? 'Lo que dicen nuestros huéspedes' : 'Guest Reviews'}</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {REVIEWS.map((review, i) => (
+              <div key={i} className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center gap-1 text-yellow-400 mb-4">
+                  {[...Array(review.rating)].map((_, j) => (
+                    <span key={j} className="material-symbols-outlined text-xl icon-filled">star</span>
+                  ))}
+                </div>
+                <p className="text-text-muted dark:text-gray-300 mb-6 text-sm leading-relaxed italic">"{review.text[lang]}"</p>
+                <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <span className="font-bold">{review.author}</span>
+                  <span className="text-xs text-text-muted dark:text-gray-500">{review.date[lang]}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <a
+              href={LOCATION_DATA.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
+            >
+              {lang === 'es' ? `Ver las ${LOCATION_DATA.totalReviews} reseñas en Google` : `See all ${LOCATION_DATA.totalReviews} Google reviews`}
+              <span className="material-symbols-outlined text-lg">open_in_new</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Location Section */}
+        <div className="bg-surface-dark rounded-3xl overflow-hidden relative text-white group">
+          <div className="absolute inset-0 bg-[url('/images/apartment/terrace.jpg')] bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+
+          <div className="relative p-10 lg:p-16 max-w-2xl">
+            <span className="text-primary font-bold text-xs uppercase tracking-[0.3em] mb-4 block">
+              {lang === 'es' ? 'Ubicación Premium' : 'Premium Location'}
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-black mb-6">
+              {lang === 'es' ? 'En el corazón de La Barrosa' : 'In the heart of La Barrosa'}
+            </h2>
+            <p className="text-white/70 text-lg mb-8 leading-relaxed">
+              {LOCATION_DATA.address}
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <a
+                href={LOCATION_DATA.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-14 px-8 bg-white text-black font-bold rounded-2xl flex items-center gap-3 hover:bg-gray-100 transition-all shadow-xl"
+              >
+                <span className="material-symbols-outlined">map</span>
+                {lang === 'es' ? 'Cómo llegar' : 'Get Directions'}
+              </a>
+            </div>
           </div>
         </div>
       </div>

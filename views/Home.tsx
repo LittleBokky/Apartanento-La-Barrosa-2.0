@@ -59,11 +59,11 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
           <p className="text-lg text-text-muted dark:text-gray-300 max-w-xl leading-relaxed">
             {t.heroDesc} <span className="font-bold text-text-main dark:text-white">{t.promo}</span>
           </p>
-          
+
           <div className="flex flex-wrap gap-4">
-            <button className="h-14 px-8 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all shadow-xl shadow-primary/20 flex items-center gap-2">
+            <Link to="/apartment" className="h-14 px-8 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all shadow-xl shadow-primary/20 flex items-center gap-2">
               {t.gallery}
-            </button>
+            </Link>
             <Link to="/services" className="h-14 px-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold flex items-center justify-center hover:bg-gray-50 transition-all">
               {t.learnMore}
             </Link>
@@ -89,14 +89,14 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
 
         <div className="lg:w-1/2 w-full h-[500px] lg:h-[650px] grid grid-cols-2 gap-4">
           <div className="h-full rounded-2xl overflow-hidden shadow-2xl relative group">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfc0Q5X_lPmae-PhK8-fNBEUZZgho9lEIGh_6tcd6LnCMuEGO7ya416miwRRj2SLKDjgj0TGGBZdLMa0TXaAIMyBn3hrrYvxhpGSSIbnY9dvn85jAeQVZCaTGaXjKCSvxSC4ZLh3a5Vvb1D0CtDNSw8yQjqjM9z9y2CeqsBX1FFe8FIwpCo1gx1SHVeCZCU0foWajkrkrsdPWPV5WqeR9WZEk4dTaVo8EmWplzAXUTGjrkLu6x5faVGGwHbw9D_i-kgk7waMi-5FYS" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Living Room" />
+            <img src="/images/home/hero_1.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Sunset Gazebo" />
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex-1 rounded-2xl overflow-hidden shadow-2xl relative group">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfLsZ2G7Hb90vJDcLDqxq61S--IhdWzIzywSJV73-TWEyQ_qLGF0A5zH9_jzwZNkiU-uRTmutE-UQQYf0j5HhGoalw3j1DLuwasDsc9I0mS0kHwQT0wBkpKu-ySSNS-yeyIFm2dTIvzzTWLTE2MT184mGHIN9uDnprmuz7LjfdNVMT6XfzlsMFPdSR5jcQ-yb5Erx0hhYfx5lIacyzL6HH5TB3ELI3khbmn05jT-7FUFOEIQw1rXq2noIz2vw8upwUwV374_dmlEuZ" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Pool Area" />
+              <img src="/images/home/hero_3.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Pool Area" />
             </div>
             <div className="flex-1 rounded-2xl overflow-hidden shadow-2xl relative group">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD_44EEDt10cGol4wPlugYm-tepW0DF4OmhOUSjFQTHlC7cmmW7WqTuAoMgWsc5ehFv4WMRuE_S3SDlRWZC7Rat70UX58nOkHsZUhacswXUW7WgOrrjVzQ_St7T6sRVxUK7dfmlgxXrbx68Y17GkjgzYhQRq7aFWUZa2yUn27LeJH2l0oh6atj72pUrMGOu6jqvZDfwQ-IAQpEUStSpNIZJ8RzVWqeAio0ZVFmb7dDMp5IBD-TvoFkIYzvXEMRbpSUnBQQbwnyDL0u" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Bedroom" />
+              <img src="/images/home/hero_2.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Living Room" />
             </div>
           </div>
         </div>
