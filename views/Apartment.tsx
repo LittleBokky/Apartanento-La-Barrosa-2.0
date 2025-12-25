@@ -6,39 +6,94 @@ import { supabase } from '../lib/supabase';
 
 const REVIEWS = [
   {
-    author: "Mariluz P.",
+    author: "Sandrine",
     rating: 5,
-    date: { es: "Hace 7 meses", en: "7 months ago" },
+    platform: "airbnb",
+    date: { es: "Octubre 2025", en: "October 2025", it: "Ottobre 2025", fr: "Octobre 2025", de: "Oktober 2025" },
     text: {
-      es: "Cogimos el apartamento para el fin de semana y ha sido una estancia genial. Antonio es un gran anfitrión, preocupado en todo momento porque no nos faltase de nada...",
-      en: "We booked the apartment for the weekend and had a great stay. Antonio is a great host, ensuring at all times that we had everything we needed..."
+      es: "Excelente estancia. Alojamiento conforme a la descripción, decoración muy moderna, limpio, tranquilo y bien equipado. También apreciamos mucho la terraza. Muy recomendable.",
+      en: "Excellent stay. Accommodation as described, very modern decoration, clean, quiet and well equipped. We also really appreciated the terrace. Highly recommended.",
+      it: "Soggiorno eccellente. Alloggio conforme alla descrizione, arredamento molto moderno, pulito, tranquillo e ben attrezzato. Abbiamo apprezzato molto anche la terrazza. Altamente raccomandato.",
+      fr: "Excellent séjour. Logement conforme à la description, décoration très moderne, propre, calme et bien équipé. Nous avons également beaucoup apprécié la terrasse. Je le recommande vivement.",
+      de: "Ausgezeichneter Aufenthalt. Unterkunft wie beschrieben, sehr moderne Einrichtung, sauber, ruhig und gut ausgestattet. Wir haben auch die Terrasse sehr genossen. Sehr zu empfehlen."
+    }
+  },
+  {
+    author: "Mari",
+    rating: 5,
+    platform: "booking",
+    date: { es: "Diciembre 2025", en: "December 2025", it: "Dicembre 2025", fr: "Décembre 2025", de: "Dezember 2025" },
+    text: {
+      es: "Es muy bonito, está muy limpio y tiene todas las comodidades. Ya he estado en otras ocasiones en él por todo ello. Muy recomendable.",
+      en: "It is very beautiful, very clean and has all the comforts. I have been there on other occasions because of all this. Highly recommended.",
+      it: "È molto bello, è molto pulito e ha tutti i comfort. Ci sono già stata altre volte proprio per questo. Altamente raccomandato.",
+      fr: "C'est très beau, c'est très propre et il y a tout le confort. J'y suis déjà allée à d'autres occasions pour tout cela. Très recommandé.",
+      de: "Es ist sehr schön, es ist sehr sauber und hat alle Annehmlichkeiten. Ich war deshalb schon öfter dort. Sehr zu empfehlen."
+    }
+  },
+  {
+    author: "Cecilia",
+    rating: 5,
+    platform: "booking",
+    date: { es: "Julio 2025", en: "July 2025", it: "Luglio 2025", fr: "Juillet 2025", de: "Juli 2025" },
+    text: {
+      es: "Nuestra estancia fue simplemente perfecta. El apartamento estaba impecablemente limpio, muy bien equipado y decorado con gusto. La ubicación es inmejorable: a pocos minutos andando de la playa.",
+      en: "Our stay was simply perfect. The apartment was impeccably clean, very well equipped and tastefully decorated. The location is unbeatable: a few minutes' walk from the beach.",
+      it: "Il nostro soggiorno è stato semplicemente perfetto. L'appartamento era impeccabilmente pulito, molto ben attrezzato e arredato con gusto. La posizione è imbattibile: a pochi minuti a piedi dalla spiaggia.",
+      fr: "Notre séjour a été tout simplement parfait. L'appartement était impeccablement propre, très bien équipé et décoré avec goût. L'emplacement est imbattable : à quelques minutes à pied de la plage.",
+      de: "Unser Aufenthalt war einfach perfekt. Die Wohnung war makellos sauber, sehr gut ausgestattet und geschmackvoll eingerichtet. Die Lage ist unschlagbar: nur wenige Gehminuten vom Strand entfernt."
+    }
+  },
+  {
+    author: "Eric",
+    rating: 5,
+    platform: "airbnb",
+    date: { es: "Octubre 2024", en: "October 2024", it: "Ottobre 2024", fr: "Octobre 2024", de: "Oktober 2024" },
+    text: {
+      es: "Apartamento muy bonito, muy cómodo, estado nuevo, en una zona tranquila y con una ubicación ideal para disfrutar del océano.",
+      en: "Very nice apartment, very comfortable, new condition, in a quiet area and with an ideal location to enjoy the ocean.",
+      it: "Appartamento molto bello, molto confortevole, come nuovo, in una zona tranquilla e con una posizione ideale per godersi l'oceano.",
+      fr: "Très bel appartement, très confortable, état neuf, dans un quartier calme et avec un emplacement idéal pour profiter de l'océan.",
+      de: "Sehr schöne Wohnung, sehr komfortabel, neuwertiger Zustand, in einer ruhigen Gegend und mit einer idealen Lage, um das Meer zu genießen."
     }
   },
   {
     author: "Carla Guerrero",
     rating: 5,
-    date: { es: "Hace 5 meses", en: "5 months ago" },
+    platform: "google",
+    date: { es: "Hace 5 meses", en: "5 months ago", it: "5 mesi fa", fr: "Il y a 5 mois", de: "Vor 5 Monaten" },
     text: {
-      es: "Es el segundo año que alquilo el apartamento de Antonio en Chiclana y, como siempre, todo perfecto. Cómodo, limpio y bien ubicado. Antonio es muy buen anfitrión, repetiremos seguro!",
-      en: "This is the second year I've rented Antonio's apartment in Chiclana and, as always, everything was perfect. Comfortable, clean, and well-located. Antonio is a very good host, we will definitely return!"
+      es: "Es el segundo año que alquilo el apartamento de Antonio en Chiclana y, como siempre, todo perfecto. Cómodo, limpio y bien ubicado. repetiremos seguro!",
+      en: "This is the second year I've rented Antonio's apartment in Chiclana and, as always, everything was perfect. Comfortable, clean, and well-located. we will definitely return!",
+      it: "È il secondo anno che affitto l'appartamento di Antonio a Chiclana e, come sempre, tutto perfetto. Confortevole, pulito e ben posizionato. ci torneremo sicuramente!",
+      fr: "C'est la deuxième année que je loue l'appartement d'Antonio à Chiclana et, comme toujours, tout était parfait. Confortable, propre et bien situé. nous reviendrons à coup sûr !",
+      de: "Dies ist das zweite Jahr, in dem ich Antonios Apartment in Chiclana miete, und wie immer war alles perfekt. Komfortabel, sauber und gut gelegen. Wir kommen auf jeden Fall wieder!"
     }
   },
   {
-    author: "Ana Herrero",
+    author: "Laura",
     rating: 5,
-    date: { es: "Hace 2 años", en: "2 years ago" },
+    platform: "booking",
+    date: { es: "Septiembre 2025", en: "September 2025", it: "Settembre 2025", fr: "Septembre 2025", de: "September 2025" },
     text: {
-      es: "Alojamiento muy cómodo, completo y cuidando hasta el más mínimo detalle. Limpieza y orden exquisitos...",
-      en: "Very comfortable accommodation, complete and taking care of even the smallest detail. Exquisite cleanliness and order..."
+      es: "Todo estaba como nuevo exactamente como se ve en las fotos. Todo muy limpio y cómodo.",
+      en: "Everything was like new, exactly as seen in the photos. Everything was very clean and comfortable.",
+      it: "Tutto era come nuovo, esattamente come si vede nelle foto. Tutto molto pulito e confortevole.",
+      fr: "Tout était comme neuf, exactement comme sur les photos. Tout était très propre et confortable.",
+      de: "Alles war wie neu, genau wie auf den Fotos zu sehen. Alles sehr sauber und komfortabel."
     }
   }
 ];
 
+const PLATFORMS = [
+  { name: "Booking.com", rating: "9.7", total: 69, link: "https://www.booking.com/hotel/es/apartamento-playa-la-barrosa-chiclana-de-la-frontera.es.html" },
+  { name: "Airbnb", rating: "4.97", total: 37, link: "https://www.airbnb.es/rooms/35460015" },
+  { name: "Google", rating: "5.0", total: 56, link: "https://share.google/5zMiwCH1MPPcNr0Qf" }
+];
+
 const LOCATION_DATA = {
   address: "Av. de los Pescadores, 16, 11139 Chiclana de la Frontera, Cádiz, España",
-  link: "https://share.google/5zMiwCH1MPPcNr0Qf",
-  rating: 5.0,
-  totalReviews: 56
+  link: "https://share.google/5zMiwCH1MPPcNr0Qf"
 };
 
 interface GalleryImage {
@@ -52,6 +107,7 @@ interface GalleryImage {
 const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
   const isAdmin = user?.role === 'admin';
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [reviewIdx, setReviewIdx] = useState(0);
   const [photos, setPhotos] = useState<any[]>([]);
   const [dbGallery, setDbGallery] = useState<GalleryImage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -195,6 +251,42 @@ const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
       terraceDesc: "Private terrace with dining area to enjoy the Cádiz climate under the shade.",
       living: "Connectivity & Leisure",
       livingDesc: "50\" Smart TV, dedicated workspace, and a cozy atmosphere with nautical touches."
+    },
+    it: {
+      title: "Il tuo rifugio sulla costa",
+      subtitle: "Uno spazio progettato per il relax, con finiture in legno naturale e luce mediterranea.",
+      roomsTitle: "Spazi Progettati",
+      roomsDesc: "Ogni angolo è stato pensato per offrirti il massimo comfort durante il tuo soggiorno.",
+      kitchen: "Cucina Attrezzata",
+      kitchenDesc: "Elettrodomestici Siemens, macchina del caffè Nespresso e tutte le stoviglie necessarie.",
+      terrace: "Oasi Esterna",
+      terraceDesc: "Terrazza privata con zona pranzo per godersi il clima di Cadice sotto la tenda.",
+      living: "Connettività e tempo libero",
+      livingDesc: "Smart TV da 50\", zona lavoro e un'atmosfera accogliente con tocchi marinari."
+    },
+    fr: {
+      title: "Votre refuge côtier",
+      subtitle: "Un espace conçu pour la détente, avec des finitions en bois naturel et une lumière méditerranéenne.",
+      roomsTitle: "Espaces Conçus",
+      roomsDesc: "Chaque recoin a été pensé pour vous offrir un maximum de confort pendant votre séjour.",
+      kitchen: "Cuisine Équipée",
+      kitchenDesc: "Appareils Siemens, machine à café Nespresso et tous les ustensiles de cuisine nécessaires.",
+      terrace: "Oasis Extérieure",
+      terraceDesc: "Terrasse privée avec coin repas pour profiter du climat de Cadix à l'ombre.",
+      living: "Connectivité et Loisirs",
+      livingDesc: "Smart TV 50\", espace de travail et ambiance chaleureuse aux touches nautiques."
+    },
+    de: {
+      title: "Ihr Rückzugsort an der Küste",
+      subtitle: "Ein Ort zum Entspannen, mit natürlichen Holzoberflächen und mediterranem Licht.",
+      roomsTitle: "Gestaltete Räume",
+      roomsDesc: "Jede Ecke wurde durchdacht, um Ihnen während Ihres Aufenthalts maximalen Komfort zu bieten.",
+      kitchen: "Ausgestattete Küche",
+      kitchenDesc: "Siemens-Elektrogeräte, Nespresso-Kaffeemaschine und alle notwendigen Küchenutensilien.",
+      terrace: "Oase im Freien",
+      terraceDesc: "Private Terrasse mit Essbereich, um das Klima von Cádiz im Schatten zu genießen.",
+      living: "Konnektivität & Freizeit",
+      livingDesc: "50\" Smart TV, Arbeitsbereich und eine gemütliche Atmosphäre mit Akzenten zum Meer."
     }
   }[lang]), [lang]);
 
@@ -220,6 +312,39 @@ const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
       titleEs: "Title (ES)",
       titleEn: "Title (EN)",
       order: "Order"
+    },
+    it: {
+      gallery: "Gestione Galleria",
+      uploading: "Caricamento...",
+      uploadPhoto: "Carica Foto",
+      editPhoto: "Modifica Foto",
+      save: "Salva",
+      cancel: "Annulla",
+      titleEs: "Titolo (ES)",
+      titleEn: "Titolo (EN)",
+      order: "Ordine"
+    },
+    fr: {
+      gallery: "Gestion de la Galerie",
+      uploading: "Chargement...",
+      uploadPhoto: "Télécharger une Photo",
+      editPhoto: "Modifier la Photo",
+      save: "Enregistrer",
+      cancel: "Annuler",
+      titleEs: "Titre (ES)",
+      titleEn: "Titre (EN)",
+      order: "Ordre"
+    },
+    de: {
+      gallery: "Galerie-Verwaltung",
+      uploading: "Hochladen...",
+      uploadPhoto: "Foto hochladen",
+      editPhoto: "Foto bearbeiten",
+      save: "Speichern",
+      cancel: "Abbrechen",
+      titleEs: "Titel (ES)",
+      titleEn: "Titel (EN)",
+      order: "Reihenfolge"
     }
   }[lang]), [lang]);
 
@@ -493,44 +618,110 @@ const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-24 mb-20">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="flex items-center gap-1 bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 px-4 py-2 rounded-full border border-yellow-400/20">
-              <span className="material-symbols-outlined text-sm icon-filled">star</span>
-              <span className="font-bold text-sm">{LOCATION_DATA.rating}</span>
+        <div className="mt-24 mb-20 px-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 max-w-5xl mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-black">{lang === 'es' ? 'Lo que dicen nuestros huéspedes' : 'Guest Reviews'}</h2>
+            <div className="flex flex-wrap gap-4">
+              {PLATFORMS.map((p, i) => (
+                <div key={i} className="flex items-center gap-2 bg-white dark:bg-surface-dark px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <span className={`size-2 rounded-full ${p.name === 'Airbnb' ? 'bg-[#FF385C]' : p.name === 'Booking.com' ? 'bg-[#003580]' : 'bg-[#4285F4]'}`}></span>
+                  <span className="text-xs font-black uppercase tracking-wider">{p.name}</span>
+                  <span className="font-bold text-primary">{p.rating}</span>
+                </div>
+              ))}
             </div>
-            <h2 className="text-3xl font-black">{lang === 'es' ? 'Lo que dicen nuestros huéspedes' : 'Guest Reviews'}</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {REVIEWS.map((review, i) => (
-              <div key={i} className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-center gap-1 text-yellow-400 mb-4">
-                  {[...Array(review.rating)].map((_, j) => (
-                    <span key={j} className="material-symbols-outlined text-xl icon-filled">star</span>
-                  ))}
-                </div>
-                <p className="text-text-muted dark:text-gray-300 mb-6 text-sm leading-relaxed italic">"{review.text[lang]}"</p>
-                <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <span className="font-bold">{review.author}</span>
-                  <span className="text-xs text-text-muted dark:text-gray-500">{review.date[lang]}</span>
-                </div>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="overflow-hidden rounded-[2rem]">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${reviewIdx * 100}%)` }}
+              >
+                {REVIEWS.map((review: any, i) => (
+                  <div key={i} className="w-full flex-shrink-0 px-2 lg:px-4">
+                    <div className="bg-white dark:bg-surface-dark p-8 lg:p-12 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col min-h-[320px]">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-0.5 text-yellow-500">
+                          {[...Array(review.rating)].map((_, j) => (
+                            <span key={j} className="material-symbols-outlined text-[24px] icon-filled">star</span>
+                          ))}
+                        </div>
+                        <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${review.platform === 'airbnb' ? 'bg-[#FF385C]/10 text-[#FF385C]' :
+                          review.platform === 'booking' ? 'bg-[#003580]/10 text-[#003580]' : 'bg-[#4285F4]/10 text-[#4285F4]'
+                          }`}>
+                          {review.platform}
+                        </div>
+                      </div>
+                      <p className="text-text-muted dark:text-gray-300 mb-10 text-lg lg:text-xl leading-relaxed italic font-medium flex-grow">
+                        "{review.text[lang]}"
+                      </p>
+                      <div className="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-8">
+                        <div className="flex items-center gap-4">
+                          <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl">
+                            {review.author.charAt(0)}
+                          </div>
+                          <div>
+                            <span className="block font-black text-base">{review.author}</span>
+                            <span className="block text-xs text-text-muted dark:text-gray-500 uppercase tracking-[0.2em] mt-1 font-bold">{review.date[lang]}</span>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-200 dark:text-gray-800 text-6xl opacity-30">format_quote</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
+
+            {/* Carousel Controls */}
+            <div className="flex items-center justify-between mt-10">
+              <div className="flex gap-2">
+                {REVIEWS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setReviewIdx(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${i === reviewIdx ? 'w-10 bg-primary' : 'w-2 bg-gray-200 dark:bg-gray-800'}`}
+                    aria-label={`Go to review ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setReviewIdx(prev => (prev - 1 + REVIEWS.length) % REVIEWS.length)}
+                  className="size-12 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
+                >
+                  <span className="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button
+                  onClick={() => setReviewIdx(prev => (prev + 1) % REVIEWS.length)}
+                  className="size-12 rounded-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
+                >
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 flex flex-wrap justify-center gap-10">
+            {PLATFORMS.map((p, i) => (
+              <a
+                key={i}
+                href={p.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-2"
+              >
+                <div className="flex items-center gap-2 text-xs font-bold text-text-muted group-hover:text-primary transition-colors">
+                  {lang === 'es' ? `Ver ${p.total} reseñas en ${p.name}` : `See all ${p.total} ${p.name} reviews`}
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                </div>
+                <div className="h-0.5 w-0 group-hover:w-full bg-primary transition-all duration-300"></div>
+              </a>
             ))}
           </div>
-
-          <div className="mt-6 text-center">
-            <a
-              href={LOCATION_DATA.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
-            >
-              {lang === 'es' ? `Ver las ${LOCATION_DATA.totalReviews} reseñas en Google` : `See all ${LOCATION_DATA.totalReviews} Google reviews`}
-              <span className="material-symbols-outlined text-lg">open_in_new</span>
-            </a>
-          </div>
         </div>
+
 
         {/* Location Section */}
         <div className="bg-surface-dark rounded-3xl overflow-hidden relative text-white group">
@@ -539,10 +730,10 @@ const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
 
           <div className="relative p-10 lg:p-16 max-w-2xl">
             <span className="text-primary font-bold text-xs uppercase tracking-[0.3em] mb-4 block">
-              {lang === 'es' ? 'Ubicación Premium' : 'Premium Location'}
+              {{ es: 'Ubicación Premium', en: 'Premium Location', it: 'Posizione Premium', fr: 'Emplacement Privilégié', de: 'Premium-Lage' }[lang]}
             </span>
             <h2 className="text-3xl lg:text-4xl font-black mb-6">
-              {lang === 'es' ? 'En el corazón de La Barrosa' : 'In the heart of La Barrosa'}
+              {{ es: 'En el corazón de La Barrosa', en: 'In the heart of La Barrosa', it: 'Nel cuore di La Barrosa', fr: 'Au cœur de La Barrosa', de: 'Im Herzen von La Barrosa' }[lang]}
             </h2>
             <p className="text-white/70 text-lg mb-8 leading-relaxed">
               {LOCATION_DATA.address}
@@ -556,7 +747,7 @@ const Apartment: React.FC<{ lang: Language, user: any }> = ({ lang, user }) => {
                 className="h-14 px-8 bg-white text-black font-bold rounded-2xl flex items-center gap-3 hover:bg-gray-100 transition-all shadow-xl"
               >
                 <span className="material-symbols-outlined">map</span>
-                {lang === 'es' ? 'Cómo llegar' : 'Get Directions'}
+                {{ es: 'Cómo llegar', en: 'Get Directions', it: 'Indicazioni', fr: 'Itinéraire', de: 'Wegbeschreibung' }[lang]}
               </a>
             </div>
           </div>

@@ -1,5 +1,5 @@
 
-export type Language = 'es' | 'en';
+export type Language = 'es' | 'en' | 'it' | 'fr' | 'de';
 
 export interface NavItem {
   id: string;

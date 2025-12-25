@@ -44,7 +44,7 @@ const Login: React.FC<LoginProps> = ({ lang, onLogin }) => {
             onLogin(userData);
             if (isAdmin) localStorage.setItem('isAdmin', 'true');
 
-            alert(lang === 'es' ? '¡Bienvenido!' : 'Welcome!');
+            alert(t.welcome);
             navigate('/');
         }
     };
@@ -72,7 +72,9 @@ const Login: React.FC<LoginProps> = ({ lang, onLogin }) => {
             forgotPassword: '¿Olvidaste tu contraseña?',
             noAccount: '¿No tienes cuenta?',
             register: 'Regístrate aquí',
-            adminLink: 'Acceso Administrador'
+            adminLink: 'Acceso Administrador',
+            welcome: '¡Bienvenido!',
+            continueWith: 'O continuar con'
         },
         en: {
             title: 'Welcome Back',
@@ -83,7 +85,48 @@ const Login: React.FC<LoginProps> = ({ lang, onLogin }) => {
             forgotPassword: 'Forgot password?',
             noAccount: "Don't have an account?",
             register: 'Register here',
-            adminLink: 'Admin Access'
+            adminLink: 'Admin Access',
+            welcome: 'Welcome!',
+            continueWith: 'Or continue with'
+        },
+        it: {
+            title: 'Bentornato!',
+            subtitle: 'Accedi al tuo account per gestire le tue prenotazioni',
+            email: 'Indirizzo e-mail',
+            password: 'Password',
+            loginButton: 'Accedi',
+            forgotPassword: 'Password dimenticata?',
+            noAccount: "Non hai un account?",
+            register: 'Registrati qui',
+            adminLink: 'Accesso Amministratore',
+            welcome: 'Benvenuto!',
+            continueWith: 'O continua con'
+        },
+        fr: {
+            title: 'Bon retour',
+            subtitle: 'Connectez-vous à votre compte pour gérer vos réservations',
+            email: 'Adresse e-mail',
+            password: 'Mot de passe',
+            loginButton: 'Se connecter',
+            forgotPassword: 'Mot de passe oublié ?',
+            noAccount: "Vous n'avez pas de compte ?",
+            register: 'Inscrivez-vous ici',
+            adminLink: 'Accès Administrateur',
+            welcome: 'Bienvenue !',
+            continueWith: 'Ou continuer avec'
+        },
+        de: {
+            title: 'Willkommen zurück',
+            subtitle: 'Melden Sie sich an, um Ihre Buchungen zu verwalten',
+            email: 'E-Mail-Adresse',
+            password: 'Passwort',
+            loginButton: 'Anmelden',
+            forgotPassword: 'Passwort vergessen?',
+            noAccount: "Sie haben noch kein Konto?",
+            register: 'Hier registrieren',
+            adminLink: 'Admin-Zugang',
+            welcome: 'Willkommen!',
+            continueWith: 'Oder fortfahren mit'
         }
     }[lang];
 
@@ -159,7 +202,7 @@ const Login: React.FC<LoginProps> = ({ lang, onLogin }) => {
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-white dark:bg-surface-dark px-2 text-text-muted">
-                                {lang === 'es' ? 'O continuar con' : 'Or continue with'}
+                                {t.continueWith}
                             </span>
                         </div>
                     </div>

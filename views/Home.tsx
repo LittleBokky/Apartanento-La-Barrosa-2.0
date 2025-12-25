@@ -17,6 +17,11 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
       whyUs: "Por Qué Nos Eligen",
       whyUsDesc: "Todo lo que necesitas para una escapada perfecta.",
       amenities: "Ver todas las comodidades",
+      official: "Sitio Oficial",
+      from: "Desde",
+      night: "noche",
+      checkAv: "Consultar Disponibilidad",
+      saveDirect: "Ahorra 15% Directo",
       features: [
         { icon: 'wifi', title: 'Wifi Rápido', desc: 'Ideal para trabajar' },
         { icon: 'pool', title: 'Piscina Privada', desc: 'Acceso exclusivo' },
@@ -36,11 +41,88 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
       whyUs: "Why They Choose Us",
       whyUsDesc: "Everything you need for a perfect getaway.",
       amenities: "See all amenities",
+      official: "Official Site",
+      from: "From",
+      night: "night",
+      checkAv: "Check Availability",
+      saveDirect: "Save 15% Direct",
       features: [
         { icon: 'wifi', title: 'Fast Wifi', desc: 'Ideal for working' },
         { icon: 'pool', title: 'Private Pool', desc: 'Exclusive access' },
         { icon: 'location_on', title: 'Prime Location', desc: '5 min from beach' },
         { icon: 'local_parking', title: 'Free Parking', desc: 'Guaranteed spot' }
+      ]
+    },
+    it: {
+      heroTitle: "Vivi il meglio di",
+      heroHighlight: "La Barrosa",
+      heroDesc: "Svegliati con la brezza marina e il massimo comfort. Prenota direttamente per ottenere le migliori tariffe.",
+      promo: "Risparmia il 15% all'istante prenotando direttamente.",
+      gallery: "Vedi Galleria",
+      learnMore: "Saperne di più",
+      reviews: "Basato su +120 recensioni",
+      favorite: "Preferito dagli ospiti",
+      whyUs: "Perché sceglierci",
+      whyUsDesc: "Tutto ciò di cui hai bisogno per una fuga perfetta.",
+      amenities: "Vedi tutti i servizi",
+      official: "Sito Ufficiale",
+      from: "Da",
+      night: "notte",
+      checkAv: "Verifica Disponibilità",
+      saveDirect: "Risparmia 15% Diretto",
+      features: [
+        { icon: 'wifi', title: 'Wifi Veloce', desc: 'Ideale per lavorare' },
+        { icon: 'pool', title: 'Piscina Privata', desc: 'Accesso esclusivo' },
+        { icon: 'location_on', title: 'Posizione Prime', desc: 'A 5 min dalla spiaggia' },
+        { icon: 'local_parking', title: 'Parcheggio Gratuito', desc: 'Posto assicurato' }
+      ]
+    },
+    fr: {
+      heroTitle: "Vivez le meilleur de",
+      heroHighlight: "La Barrosa",
+      heroDesc: "Réveillez-vous avec la brise marine et un confort maximal. Réservez directement pour obtenir les meilleurs tarifs.",
+      promo: "Économisez 15% instantanément en réservant directement.",
+      gallery: "Voir la galerie",
+      learnMore: "En savoir plus",
+      reviews: "Basé sur +120 avis",
+      favorite: "Coup de cœur des voyageurs",
+      whyUs: "Pourquoi nous choisir",
+      whyUsDesc: "Tout ce dont vous avez besoin pour une escapade parfaite.",
+      amenities: "Voir tous les équipements",
+      official: "Site Officiel",
+      from: "À partir de",
+      night: "nuit",
+      checkAv: "Vérifier la Disponibilité",
+      saveDirect: "Économisez 15% en Direct",
+      features: [
+        { icon: 'wifi', title: 'Wifi Rapide', desc: 'Idéal pour travailler' },
+        { icon: 'pool', title: 'Piscine Privée', desc: 'Accès exclusif' },
+        { icon: 'location_on', title: 'Emplacement Privilégié', desc: 'À 5 min de la plage' },
+        { icon: 'local_parking', title: 'Parking Gratuit', desc: 'Place garantie' }
+      ]
+    },
+    de: {
+      heroTitle: "Erleben Sie das Beste von",
+      heroHighlight: "La Barrosa",
+      heroDesc: "Wachen Sie mit der Meeresbrise und maximalem Komfort auf. Buchen Sie direkt, um die besten Preise zu erhalten.",
+      promo: "Sparen Sie sofort 15% bei Direktbuchung.",
+      gallery: "Galerie ansehen",
+      learnMore: "Mehr erfahren",
+      reviews: "Basierend auf +120 Bewertungen",
+      favorite: "Liebling der Gäste",
+      whyUs: "Warum uns wählen",
+      whyUsDesc: "Alles, was Sie für einen perfekten Kurzurlaub brauchen.",
+      amenities: "Alle Annehmlichkeiten ansehen",
+      official: "Offizielle Website",
+      from: "Ab",
+      night: "Nacht",
+      checkAv: "Verfügbarkeit prüfen",
+      saveDirect: "15% sparen bei Direktbuchung",
+      features: [
+        { icon: 'wifi', title: 'Schnelles WLAN', desc: 'Ideal zum Arbeiten' },
+        { icon: 'pool', title: 'Privater Pool', desc: 'Exklusiver Zugang' },
+        { icon: 'location_on', title: 'Top-Lage', desc: '5 Min. vom Strand entfernt' },
+        { icon: 'local_parking', title: 'Kostenloser Parkplatz', desc: 'Garantierter Platz' }
       ]
     }
   }[lang];
@@ -51,7 +133,7 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
         <div className="lg:w-1/2 flex flex-col items-start gap-8 z-10 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
             <span className="material-symbols-outlined !text-sm">verified</span>
-            {lang === 'es' ? 'Sitio Oficial' : 'Official Site'}
+            {t.official}
           </div>
           <h1 className="text-5xl lg:text-7xl font-black leading-[1.1] tracking-tight">
             {t.heroTitle} <span className="text-primary">{t.heroHighlight}</span>
@@ -133,13 +215,13 @@ const Home: React.FC<{ lang: Language }> = ({ lang }) => {
         <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="hidden md:flex items-center gap-2">
             <div className="text-right">
-              <p className="text-[10px] font-bold uppercase text-text-muted">{lang === 'es' ? 'Desde' : 'From'}</p>
-              <p className="text-xl font-black">€120 <span className="text-sm font-normal text-text-muted">/ {lang === 'es' ? 'noche' : 'night'}</span></p>
+              <p className="text-[10px] font-bold uppercase text-text-muted">{t.from}</p>
+              <p className="text-xl font-black">€120 <span className="text-sm font-normal text-text-muted">/ {t.night}</span></p>
             </div>
           </div>
           <Link to="/booking" className="w-full md:w-auto h-14 px-10 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl flex flex-col items-center justify-center shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 active:scale-95">
-            <span className="text-base">{lang === 'es' ? 'Consultar Disponibilidad' : 'Check Availability'}</span>
-            <span className="text-[10px] font-medium opacity-80 uppercase tracking-widest">{lang === 'es' ? 'Ahorra 15% Directo' : 'Save 15% Direct'}</span>
+            <span className="text-base">{t.checkAv}</span>
+            <span className="text-[10px] font-medium opacity-80 uppercase tracking-widest">{t.saveDirect}</span>
           </Link>
         </div>
       </div>

@@ -25,7 +25,7 @@ const Register: React.FC<RegisterProps> = ({ lang }) => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert(lang === 'es' ? 'Las contraseñas no coinciden' : 'Passwords do not match');
+            alert(t.passwordsNoMatch);
             return;
         }
 
@@ -49,10 +49,7 @@ const Register: React.FC<RegisterProps> = ({ lang }) => {
         }
 
         if (data.user) {
-            alert(lang === 'es'
-                ? '¡Registro casi completado! Por favor, revisa tu correo electrónico para confirmar tu cuenta.'
-                : 'Registration almost complete! Please check your email to confirm your account.'
-            );
+            alert(t.regAlmostComplete);
         }
     };
 
@@ -79,7 +76,10 @@ const Register: React.FC<RegisterProps> = ({ lang }) => {
             confirmPassword: 'Confirmar Contraseña',
             registerButton: 'Registrarse',
             hasAccount: '¿Ya tienes cuenta?',
-            login: 'Inicia sesión'
+            login: 'Inicia sesión',
+            passwordsNoMatch: 'Las contraseñas no coinciden',
+            regAlmostComplete: '¡Registro casi completado! Por favor, revisa tu correo electrónico para confirmar tu cuenta.',
+            continueWith: 'O continuar con'
         },
         en: {
             title: 'Create Account',
@@ -90,7 +90,52 @@ const Register: React.FC<RegisterProps> = ({ lang }) => {
             confirmPassword: 'Confirm Password',
             registerButton: 'Sign Up',
             hasAccount: 'Already have an account?',
-            login: 'Sign in'
+            login: 'Sign in',
+            passwordsNoMatch: 'Passwords do not match',
+            regAlmostComplete: 'Registration almost complete! Please check your email to confirm your account.',
+            continueWith: 'Or continue with'
+        },
+        it: {
+            title: 'Crea un Account',
+            subtitle: 'Unisciti a noi per un\'esperienza di prenotazione migliore',
+            name: 'Nome Completo',
+            email: 'Indirizzo e-mail',
+            password: 'Password',
+            confirmPassword: 'Conferma Password',
+            registerButton: 'Registrati',
+            hasAccount: 'Hai già un account?',
+            login: 'Accedi',
+            passwordsNoMatch: 'Le password non coincidono',
+            regAlmostComplete: 'Registrazione quasi completata! Per favore, controlla la tua e-mail per confermare il tuo account.',
+            continueWith: 'O continua con'
+        },
+        fr: {
+            title: 'Créer un compte',
+            subtitle: 'Rejoignez-nous pour une meilleure expérience de réservation',
+            name: 'Nom complet',
+            email: 'Adresse e-mail',
+            password: 'Mot de passe',
+            confirmPassword: 'Confirmer le mot de passe',
+            registerButton: 'S\'inscrire',
+            hasAccount: 'Vous avez déjà un compte ?',
+            login: 'Se connecter',
+            passwordsNoMatch: 'Les mots de passe ne correspondent pas',
+            regAlmostComplete: 'Inscription presque terminée ! Veuillez consulter vos e-mails pour confirmer votre compte.',
+            continueWith: 'Ou continuer avec'
+        },
+        de: {
+            title: 'Konto erstellen',
+            subtitle: 'Werden Sie Teil von uns für ein noch besseres Buchungserlebnis',
+            name: 'Vollständiger Name',
+            email: 'E-Mail-Adresse',
+            password: 'Passwort',
+            confirmPassword: 'Passwort bestätigen',
+            registerButton: 'Registrieren',
+            hasAccount: 'Haben Sie bereits ein Konto?',
+            login: 'Anmelden',
+            passwordsNoMatch: 'Passwörter stimmen nicht überein',
+            regAlmostComplete: 'Registrierung fast abgeschlossen! Bitte überprüfen Sie Ihre E-Mails, um Ihr Konto zu bestätigen.',
+            continueWith: 'Oder fortfahren mit'
         }
     }[lang];
 
@@ -195,7 +240,7 @@ const Register: React.FC<RegisterProps> = ({ lang }) => {
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-white dark:bg-surface-dark px-2 text-text-muted">
-                                {lang === 'es' ? 'O continuar con' : 'Or continue with'}
+                                {t.continueWith}
                             </span>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays, addDays, isSameDay } from 'date-fns';
-import { enUS, es } from 'date-fns/locale';
+import { enUS, es, it, fr, de } from 'date-fns/locale';
 import { DayPicker, DateRange } from 'react-day-picker';
 import { Language } from '../types';
 import { supabase } from '../lib/supabase';
@@ -19,107 +19,14 @@ const Booking: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Pricing Logic
-  const getPriceForDate = (date: Date) => {
-    const month = date.getMonth(); // 0 = Jan, 11 = Dec
-    let basePrice = 50;
-
-    // High Season: June (5) to September (8)
-    if (month >= 5 && month <= 8) {
-      basePrice = 120;
+  const getLocaleForDateFns = (l: Language) => {
+    switch (l) {
+      case 'es': return es;
+      case 'it': return it;
+      case 'fr': return fr;
+      case 'de': return de;
+      default: return enUS;
     }
-
-    // Guest Surcharges
-    // Base price covers 2 adults. Extra adults +20€. Kids +10€.
-    const extraAdultsFee = Math.max(0, adults - 2) * 20;
-    const kidsFee = kids * 10;
-
-    return basePrice + extraAdultsFee + kidsFee;
-  };
-
-  useEffect(() => {
-    if (range?.from && range?.to) {
-      let currentDate = range.from;
-      let total = 0;
-      let nights = 0;
-
-      // Calculate price for each night
-      while (differenceInDays(range.to, currentDate) > 0) {
-        total += getPriceForDate(currentDate);
-        currentDate = addDays(currentDate, 1);
-        nights++;
-      }
-
-      setPriceDetails({
-        total,
-        nights,
-        avgPrice: nights > 0 ? total / nights : 0
-      });
-    } else {
-      setPriceDetails({ total: 0, nights: 0, avgPrice: 0 });
-    }
-  }, [range, adults, kids]);
-
-  const handleBookingConfirm = async () => {
-    if (!user) {
-      alert(lang === 'es' ? 'Debes iniciar sesión para reservar.' : 'You must log in to book.');
-      navigate('/login');
-      return;
-    }
-
-    if (!range?.from || !range?.to) return;
-
-    // Overlap check
-    const isDateBlocked = (date: Date) => {
-      return blockedDays.some(blockedDate => isSameDay(blockedDate, date));
-    };
-
-    let checkDate = range.from;
-    while (checkDate <= range.to) {
-      if (isDateBlocked(checkDate)) {
-        alert(lang === 'es' ? 'Lo sentimos, algunas de las fechas seleccionadas ya no están disponibles.' : 'Sorry, some of the selected dates are no longer available.');
-        setIsSubmitting(false);
-        return;
-      }
-      checkDate = addDays(checkDate, 1);
-    }
-
-    setIsSubmitting(true);
-
-    const check_in = format(range.from, 'yyyy-MM-dd');
-    const check_out = format(range.to, 'yyyy-MM-dd');
-
-    // Final price calculation (matching the UI)
-    const CLEANING_FEE = 45;
-    const DISCOUNT = 0.05;
-    const finalTotal = priceDetails.total + CLEANING_FEE;
-    const discountedTotal = finalTotal * (1 - DISCOUNT);
-
-    const { error } = await supabase.from('bookings').insert({
-      user_id: user.id || (await supabase.auth.getUser()).data.user?.id,
-      guest_name: user.name,
-      guest_email: user.email,
-      check_in,
-      check_out,
-      guests_adults: adults,
-      guests_children: kids,
-      total_price: Math.round(discountedTotal),
-      status: 'confirmed'
-    });
-
-    setIsSubmitting(false);
-
-    if (error) {
-      console.error('Booking error:', error);
-      alert(lang === 'es'
-        ? `Error al crear la reserva: ${error.message}`
-        : `Error creating booking: ${error.message}`);
-      return;
-    }
-
-    alert(lang === 'es' ? '¡Reserva confirmada con éxito!' : 'Booking confirmed successfully!');
-    onBookingSuccess?.();
-    navigate('/profile');
   };
 
   const t = {
@@ -143,6 +50,15 @@ const Booking: React.FC<{
       discount: "Ahorro Reserva Directa",
       taxes: "IVA e impuestos incluidos",
       emptyDates: "Selecciona tus fechas",
+      adults: "Adultos",
+      children: "Niños",
+      years: "años",
+      firstName: "Nombre",
+      lastName: "Apellidos",
+      mustLogin: "Debes iniciar sesión para reservar.",
+      dateOverlap: "Lo sentimos, algunas de las fechas seleccionadas ya no están disponibles.",
+      bookingError: "Error al crear la reserva",
+      bookingSuccess: "¡Reserva confirmada con éxito!"
     },
     en: {
       title: "Book your stay",
@@ -164,12 +80,207 @@ const Booking: React.FC<{
       discount: "Direct Booking Discount",
       taxes: "VAT and taxes included",
       emptyDates: "Select your dates",
+      adults: "Adults",
+      children: "Children",
+      years: "years",
+      firstName: "First Name",
+      lastName: "Last Name",
+      mustLogin: "You must log in to book.",
+      dateOverlap: "Sorry, some of the selected dates are no longer available.",
+      bookingError: "Error creating booking",
+      bookingSuccess: "Booking confirmed successfully!"
+    },
+    it: {
+      title: "Prenota il tuo soggiorno",
+      subtitle: "Assicurati le tue date direttamente per il miglior prezzo.",
+      step1: "Seleziona Date",
+      step2: "Dettagli Ospiti",
+      summary: "Il Tuo Soggiorno",
+      total: "Totale (EUR)",
+      confirm: "Conferma Prenotazione",
+      safe: "Processo di pagamento sicuro",
+      guarantee: "Miglior Prezzo Garantito",
+      guaranteeDesc: "Non troverai un prezzo più basso altrove.",
+      checkin: "Arrivo",
+      checkout: "Partenza",
+      selectDates: "Seleziona le date di arrivo e partenza",
+      night: "notte",
+      nights: "notti",
+      cleaning: "Pulizia",
+      discount: "Risparmio Prenotazione Diretta",
+      taxes: "IVA e tasse incluse",
+      emptyDates: "Seleziona le tue date",
+      adults: "Adulti",
+      children: "Bambini",
+      years: "anni",
+      firstName: "Nome",
+      lastName: "Cognome",
+      mustLogin: "Devi accedere per prenotare.",
+      dateOverlap: "Siamo spiacenti, alcune delle date selezionate non sono più disponibili.",
+      bookingError: "Errore durante la creazione della prenotazione",
+      bookingSuccess: "Prenotazione confermata con successo!"
+    },
+    fr: {
+      title: "Réservez votre séjour",
+      subtitle: "Bloquez vos dates directement pour le meilleur prix.",
+      step1: "Sélectionner les dates",
+      step2: "Détails des voyageurs",
+      summary: "Votre Séjour",
+      total: "Total (EUR)",
+      confirm: "Confirmer la réservation",
+      safe: "Processus de paiement sécurisé",
+      guarantee: "Meilleur prix garanti",
+      guaranteeDesc: "Vous ne trouverez pas de prix inférieur ailleurs.",
+      checkin: "Arrivée",
+      checkout: "Départ",
+      selectDates: "Sélectionnez les dates d'arrivée et de départ",
+      night: "nuit",
+      nights: "nuits",
+      cleaning: "Ménage",
+      discount: "Réduction réservation directe",
+      taxes: "TVA et taxes incluses",
+      emptyDates: "Sélectionnez vos dates",
+      adults: "Adultes",
+      children: "Enfants",
+      years: "ans",
+      firstName: "Prénom",
+      lastName: "Nom",
+      mustLogin: "Vous devez vous connecter pour réserver.",
+      dateOverlap: "Désolé, certaines des dates sélectionnées ne sont plus disponibles.",
+      bookingError: "Erreur lors de la création de la réservation",
+      bookingSuccess: "Réservation confirmée avec succès !"
+    },
+    de: {
+      title: "Buchen Sie Ihren Aufenthalt",
+      subtitle: "Sichern Sie sich Ihre Termine direkt zum besten Preis.",
+      step1: "Termine wählen",
+      step2: "Details der Gäste",
+      summary: "Ihr Aufenthalt",
+      total: "Gesamt (EUR)",
+      confirm: "Buchung bestätigen",
+      safe: "Sicherer Zahlungsvorgang",
+      guarantee: "Bestpreis-Garantie",
+      guaranteeDesc: "Sie werden nirgendwo anders einen niedrigeren Preis finden.",
+      checkin: "Anreise",
+      checkout: "Abreise",
+      selectDates: "Wählen Sie Anreise- und Abreisedaten",
+      night: "Nacht",
+      nights: "Nächte",
+      cleaning: "Reinigung",
+      discount: "Direktbuchungsrabatt",
+      taxes: "MwSt. und Steuern inbegriffen",
+      emptyDates: "Wählen Sie Ihre Daten",
+      adults: "Erwachsene",
+      children: "Kinder",
+      years: "Jahre",
+      firstName: "Vorname",
+      lastName: "Nachname",
+      mustLogin: "Sie müssen sich anmelden, um zu buchen.",
+      dateOverlap: "Entschuldigung, einige der ausgewählten Termine sind nicht mehr verfügbar.",
+      bookingError: "Fehler beim Erstellen der Buchung",
+      bookingSuccess: "Buchung erfolgreich bestätigt!"
     }
   }[lang];
 
-  const CLEANING_FEE = 45;
-  const DISCOUNT = 0.05; // 5% discount for demo
+  // Pricing Logic
+  const getPriceForDate = (date: Date) => {
+    const month = date.getMonth(); // 0 = Jan, 11 = Dec
+    let basePrice = 50;
 
+    // High Season: June (5) to September (8)
+    if (month >= 5 && month <= 8) {
+      basePrice = 120;
+    }
+
+    // Guest Surcharges
+    const extraAdultsFee = Math.max(0, adults - 2) * 20;
+    const kidsFee = kids * 10;
+
+    return basePrice + extraAdultsFee + kidsFee;
+  };
+
+  useEffect(() => {
+    if (range?.from && range?.to) {
+      let currentDate = range.from;
+      let total = 0;
+      let nights = 0;
+
+      while (differenceInDays(range.to, currentDate) > 0) {
+        total += getPriceForDate(currentDate);
+        currentDate = addDays(currentDate, 1);
+        nights++;
+      }
+
+      setPriceDetails({
+        total,
+        nights,
+        avgPrice: nights > 0 ? total / nights : 0
+      });
+    } else {
+      setPriceDetails({ total: 0, nights: 0, avgPrice: 0 });
+    }
+  }, [range, adults, kids]);
+
+  const handleBookingConfirm = async () => {
+    if (!user) {
+      alert(t.mustLogin);
+      navigate('/login');
+      return;
+    }
+
+    if (!range?.from || !range?.to) return;
+
+    // Overlap check
+    const isDateBlocked = (date: Date) => {
+      return blockedDays.some(blockedDate => isSameDay(blockedDate, date));
+    };
+
+    let checkDate = range.from;
+    while (checkDate <= range.to) {
+      if (isDateBlocked(checkDate)) {
+        alert(t.dateOverlap);
+        return;
+      }
+      checkDate = addDays(checkDate, 1);
+    }
+
+    setIsSubmitting(true);
+
+    const check_in = format(range.from, 'yyyy-MM-dd');
+    const check_out = format(range.to, 'yyyy-MM-dd');
+
+    const CLEANING_FEE = 45;
+    const DISCOUNT = 0.05;
+    const finalTotal = priceDetails.total + CLEANING_FEE;
+    const discountedTotal = finalTotal * (1 - DISCOUNT);
+
+    const { error } = await supabase.from('bookings').insert({
+      user_id: user.id,
+      guest_name: user.name,
+      guest_email: user.email,
+      check_in,
+      check_out,
+      guests_adults: adults,
+      guests_children: kids,
+      total_price: Math.round(discountedTotal),
+      status: 'confirmed'
+    });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error('Booking error:', error);
+      alert(`${t.bookingError}: ${error.message}`);
+      return;
+    }
+
+    alert(t.bookingSuccess);
+    onBookingSuccess?.();
+    navigate('/profile');
+  };
+
+  const CLEANING_FEE = 45;
+  const DISCOUNT = 0.05;
   const finalTotal = priceDetails.total + CLEANING_FEE;
   const discountedTotal = finalTotal * (1 - DISCOUNT);
   const discountAmount = finalTotal * DISCOUNT;
@@ -183,7 +294,6 @@ const Booking: React.FC<{
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-8 space-y-10">
-          {/* Calendar Section */}
           <section className="bg-white dark:bg-surface-dark rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
             <h3 className="text-xl font-bold flex items-center gap-3 mb-8">
               <span className="size-7 bg-primary text-white text-xs rounded-full flex items-center justify-center font-black">1</span>
@@ -202,18 +312,13 @@ const Booking: React.FC<{
                 mode="range"
                 selected={range}
                 onSelect={setRange}
-                locale={lang === 'es' ? es : enUS}
+                locale={getLocaleForDateFns(lang)}
                 numberOfMonths={1}
                 disabled={[...blockedDays, { before: new Date() }]}
-                modifiersClassNames={{
-                  selected: 'my-selected',
-                  today: 'my-today'
-                }}
               />
             </div>
           </section>
 
-          {/* Guests section */}
           <section className="bg-white dark:bg-surface-dark rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
             <h3 className="text-xl font-bold flex items-center gap-3 mb-8">
               <span className="size-7 bg-primary text-white text-xs rounded-full flex items-center justify-center font-black">2</span>
@@ -222,8 +327,8 @@ const Booking: React.FC<{
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="flex items-center justify-between p-5 bg-gray-50 dark:bg-gray-900 rounded-2xl">
                 <div>
-                  <p className="font-bold">{lang === 'es' ? 'Adultos' : 'Adults'}</p>
-                  <p className="text-xs text-text-muted">13+ {lang === 'es' ? 'años' : 'years'}</p>
+                  <p className="font-bold">{t.adults}</p>
+                  <p className="text-xs text-text-muted">13+ {t.years}</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <button onClick={() => setAdults(Math.max(1, adults - 1))} className="size-10 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 transition-colors flex items-center justify-center">-</button>
@@ -233,8 +338,8 @@ const Booking: React.FC<{
               </div>
               <div className="flex items-center justify-between p-5 bg-gray-50 dark:bg-gray-900 rounded-2xl">
                 <div>
-                  <p className="font-bold">{lang === 'es' ? 'Niños' : 'Children'}</p>
-                  <p className="text-xs text-text-muted">2-12 {lang === 'es' ? 'años' : 'years'}</p>
+                  <p className="font-bold">{t.children}</p>
+                  <p className="text-xs text-text-muted">2-12 {t.years}</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <button onClick={() => setKids(Math.max(0, kids - 1))} className="size-10 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 transition-colors flex items-center justify-center">-</button>
@@ -244,14 +349,13 @@ const Booking: React.FC<{
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input type="text" placeholder={lang === 'es' ? 'Nombre' : 'First Name'} className="h-14 px-5 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none" />
-              <input type="text" placeholder={lang === 'es' ? 'Apellidos' : 'Last Name'} className="h-14 px-5 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none" />
+              <input type="text" placeholder={t.firstName} className="h-14 px-5 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none" />
+              <input type="text" placeholder={t.lastName} className="h-14 px-5 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none" />
               <input type="email" placeholder="Email" className="h-14 px-5 bg-gray-50 dark:bg-gray-900 border-none rounded-xl md:col-span-2 focus:ring-2 focus:ring-primary outline-none" />
             </div>
           </section>
         </div>
 
-        {/* Summary Sticky Aside */}
         <div className="lg:col-span-4">
           <div className="sticky top-28 space-y-6">
             <div className="bg-white dark:bg-surface-dark rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -269,12 +373,12 @@ const Booking: React.FC<{
                     <div className="flex items-center justify-between pb-8 border-b border-dashed border-gray-200 dark:border-gray-800 mb-8">
                       <div className="text-center">
                         <p className="text-[10px] font-bold text-text-muted uppercase mb-1">{t.checkin}</p>
-                        <p className="font-bold">{range?.from ? format(range.from, 'd MMM', { locale: lang === 'es' ? es : enUS }) : '-'}</p>
+                        <p className="font-bold">{range?.from ? format(range.from, 'd MMM', { locale: getLocaleForDateFns(lang) }) : '-'}</p>
                       </div>
                       <span className="material-symbols-outlined text-gray-300">arrow_forward</span>
                       <div className="text-center">
                         <p className="text-[10px] font-bold text-text-muted uppercase mb-1">{t.checkout}</p>
-                        <p className="font-bold">{range?.to ? format(range.to, 'd MMM', { locale: lang === 'es' ? es : enUS }) : '-'}</p>
+                        <p className="font-bold">{range?.to ? format(range.to, 'd MMM', { locale: getLocaleForDateFns(lang) }) : '-'}</p>
                       </div>
                     </div>
 

@@ -66,14 +66,14 @@ const Profile: React.FC<{
     };
 
     const handleDeleteBooking = async (id: string) => {
-        if (!window.confirm(lang === 'es' ? '¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.' : 'Are you sure you want to delete this booking? This action cannot be undone.')) {
+        if (!window.confirm(t.deleteConfirm)) {
             return;
         }
 
         const { error } = await supabase.from('bookings').delete().eq('id', id);
 
         if (error) {
-            alert(lang === 'es' ? 'Error al eliminar la reserva' : 'Error deleting booking');
+            alert(t.deleteError);
             console.error(error);
         } else {
             fetchBookings();
@@ -82,7 +82,7 @@ const Profile: React.FC<{
     };
 
     const handleDeleteMessage = async (id: string) => {
-        if (!window.confirm(lang === 'es' ? '¿Borrar este mensaje?' : 'Delete this message?')) return;
+        if (!window.confirm(t.confirmDeleteMsg)) return;
         const { error } = await supabase.from('contact_messages').delete().eq('id', id);
         if (error) console.error(error);
         else fetchMessages();
@@ -120,7 +120,15 @@ const Profile: React.FC<{
             loading: "Cargando reservas...",
             delete: "Eliminar",
             deleteAll: "Borrar todos los mensajes",
-            confirmDeleteAll: "¿Estás seguro de que deseas borrar TODOS los mensajes? Esta acción no se puede deshacer."
+            confirmDeleteAll: "¿Estás seguro de que deseas borrar TODOS los mensajes? Esta acción no se puede deshacer.",
+            adminStatus: "Administrador",
+            unknownGuest: "Huésped desconocido",
+            adults: "Adultos",
+            children: "Niños",
+            deleteConfirm: "¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.",
+            deleteError: "Error al eliminar la reserva",
+            deleteMsgError: "Error al eliminar los mensajes",
+            confirmDeleteMsg: "¿Borrar este mensaje?"
         },
         en: {
             title: "My Profile",
@@ -146,7 +154,117 @@ const Profile: React.FC<{
             loading: "Loading bookings...",
             delete: "Delete",
             deleteAll: "Delete all messages",
-            confirmDeleteAll: "Are you sure you want to delete ALL messages? This cannot be undone."
+            confirmDeleteAll: "Are you sure you want to delete ALL messages? This cannot be undone.",
+            adminStatus: "Administrator",
+            unknownGuest: "Unknown Guest",
+            adults: "Adults",
+            children: "Children",
+            deleteConfirm: "Are you sure you want to delete this booking? This action cannot be undone.",
+            deleteError: "Error deleting booking",
+            deleteMsgError: "Error deleting messages",
+            confirmDeleteMsg: "Delete this message?"
+        },
+        it: {
+            title: "Il Mio Profilo",
+            welcome: `Ciao, ${user?.name || 'Ospite'}`,
+            email: user?.email,
+            logout: "Chiudi Sessione",
+            myBookings: isAdmin ? "Gestione Prenotazioni" : "Le Mie Prenotazioni",
+            messages: "Messaggi di Contatto",
+            noMessages: "Non ci sono nuovi messaggi.",
+            upcoming: "Prossime",
+            history: "Cronologia",
+            noBookings: "Nessuna prenotazione trovata.",
+            status: {
+                confirmed: "Confermata",
+                completed: "Completata",
+                cancelled: "Annullata"
+            },
+            bookAgain: "Prenota di nuovo",
+            guest: "Ospite",
+            manageCalendar: "Gestisci Disponibilità",
+            clickToBlock: "Fai clic sui giorni per bloccare/sbloccare manualmente la loro disponibilità.",
+            blocked: "Bloccato",
+            loading: "Caricamento prenotazioni...",
+            delete: "Elimina",
+            deleteAll: "Cancella tutti i messaggi",
+            confirmDeleteAll: "Sei sicuro di voler cancellare TUTTI i messaggi? Questa azione non può essere annullata.",
+            adminStatus: "Amministratore",
+            unknownGuest: "Ospite sconosciuto",
+            adults: "Adulti",
+            children: "Bambini",
+            deleteConfirm: "Sei sicuro di voler eliminare questa prenotazione? Questa azione non può essere annullata.",
+            deleteError: "Errore nell'eliminazione della prenotazione",
+            deleteMsgError: "Errore nell'eliminazione dei messaggi",
+            confirmDeleteMsg: "Cancellare questo messaggio?"
+        },
+        fr: {
+            title: "Mon Profil",
+            welcome: `Bonjour, ${user?.name || 'Voyageur'}`,
+            email: user?.email,
+            logout: "Se déconnecter",
+            myBookings: isAdmin ? "Gestion des Réservations" : "Mes Réservations",
+            messages: "Messages de Contact",
+            noMessages: "Pas de nouveaux messages.",
+            upcoming: "A venir",
+            history: "Historique",
+            noBookings: "Aucune réservation trouvée.",
+            status: {
+                confirmed: "Confirmée",
+                completed: "Terminée",
+                cancelled: "Annulée"
+            },
+            bookAgain: "Réserver à nouveau",
+            guest: "Voyageur",
+            manageCalendar: "Gérer la Disponibilité",
+            clickToBlock: "Cliquez sur les jours pour bloquer/débloquer manuellement leur disponibilité.",
+            blocked: "Bloqué",
+            loading: "Chargement des réservations...",
+            delete: "Supprimer",
+            deleteAll: "Supprimer tous les messages",
+            confirmDeleteAll: "Êtes-vous sûr de vouloir supprimer TOUS les messages ? Cette action est irréversible.",
+            adminStatus: "Administrateur",
+            unknownGuest: "Voyageur inconnu",
+            adults: "Adultes",
+            children: "Enfants",
+            deleteConfirm: "Êtes-vous sûr de vouloir supprimer cette réservation ? Cette action est irréversible.",
+            deleteError: "Erreur lors de la suppression de la réservation",
+            deleteMsgError: "Erreur lors de la suppression des messages",
+            confirmDeleteMsg: "Supprimer ce message ?"
+        },
+        de: {
+            title: "Mein Profil",
+            welcome: `Hallo, ${user?.name || 'Gast'}`,
+            email: user?.email,
+            logout: "Abmelden",
+            myBookings: isAdmin ? "Buchungsverwaltung" : "Meine Buchungen",
+            messages: "Kontaktanfragen",
+            noMessages: "Keine neuen Nachrichten.",
+            upcoming: "Anstehende",
+            history: "Verlauf",
+            noBookings: "Keine Buchungen gefunden.",
+            status: {
+                confirmed: "Bestätigt",
+                completed: "Abgeschlossen",
+                cancelled: "Storniert"
+            },
+            bookAgain: "Erneut buchen",
+            guest: "Gast",
+            manageCalendar: "Verfügbarkeit verwalten",
+            clickToBlock: "Klicken Sie auf die Tage, um die Verfügbarkeit manuell zu sperren/entsperren.",
+            blocked: "Gesperrt",
+            loading: "Buchungen werden geladen...",
+            delete: "Löschen",
+            deleteAll: "Alle Nachrichten löschen",
+            confirmDeleteAll: "Sind Sie sicher, dass Sie ALLE Nachrichten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+            adminStatus: "Administrator",
+            unknownGuest: "Unbekannter Gast",
+            adults: "Erwachsene",
+            children: "Kinder",
+            deleteConfirm: "Sind Sie sicher, dass Sie diese Buchung löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+            deleteError: "Fehler beim Löschen der Buchung",
+            deleteMsgError: "Fehler beim Löschen der Nachrichten",
+            confirmDeleteMsg: "Diese Nachricht löschen?"
         }
     }[lang];
 
@@ -154,7 +272,7 @@ const Profile: React.FC<{
         if (!window.confirm(t.confirmDeleteAll)) return;
         const { error } = await supabase.from('contact_messages').delete().neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
         if (error) {
-            alert(lang === 'es' ? 'Error al eliminar los mensajes' : 'Error deleting messages');
+            alert(t.deleteMsgError);
             console.error(error);
         } else {
             fetchMessages();
@@ -172,7 +290,7 @@ const Profile: React.FC<{
                         </div>
                         <h2 className="text-xl font-black mb-1">{t.welcome}</h2>
                         <p className="text-sm text-text-muted dark:text-gray-400 mb-6">{t.email}</p>
-                        {isAdmin && <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-full text-xs font-bold mb-6 uppercase tracking-wider">Administrator</span>}
+                        {isAdmin && <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-full text-xs font-bold mb-6 uppercase tracking-wider">{t.adminStatus}</span>}
 
                         <button
                             onClick={onLogout}
@@ -266,7 +384,7 @@ const Profile: React.FC<{
                                         {isAdmin ? (
                                             <div className="flex flex-col">
                                                 <h4 className="text-lg font-bold text-gray-900 dark:text-white">
-                                                    {booking.guest_name || 'Huésped desconocido'}
+                                                    {booking.guest_name || t.unknownGuest}
                                                 </h4>
                                                 <p className="text-sm text-primary font-medium">{booking.guest_email}</p>
                                             </div>
@@ -276,7 +394,7 @@ const Profile: React.FC<{
 
                                         <div className="flex flex-wrap gap-4 text-sm text-text-muted dark:text-gray-400 mt-1">
                                             <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">event</span> {booking.check_in} - {booking.check_out}</span>
-                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">group</span> {booking.guests_adults} Adultos, {booking.guests_children} Niños</span>
+                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">group</span> {booking.guests_adults} {t.adults}, {booking.guests_children} {t.children}</span>
                                         </div>
                                     </div>
 

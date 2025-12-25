@@ -31,7 +31,18 @@ const Navbar: React.FC<{
   onLogout: () => void
 }> = ({ lang, setLang, isDark, setIsDark, user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const location = useLocation();
+
+  const languages = [
+    { code: 'es', label: 'Español', flag: '🇪🇸' },
+    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+    { code: 'fr', label: 'Français', flag: '🇫🇷' },
+    { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  ];
+
+  const currentLang = languages.find(l => l.code === lang) || languages[0];
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm transition-all duration-300">
@@ -72,15 +83,42 @@ const Navbar: React.FC<{
             </Link>
           )}
 
-          <div className="hidden sm:flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          {/* Language Switcher Dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setLang('es')}
-              className={`px-3 py-1 rounded text-xs font-bold transition-all ${lang === 'es' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'text-text-muted hover:text-text-main'}`}
-            >ES</button>
-            <button
-              onClick={() => setLang('en')}
-              className={`px-3 py-1 rounded text-xs font-bold transition-all ${lang === 'en' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'text-text-muted hover:text-text-main'}`}
-            >EN</button>
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              className="h-10 px-4 flex items-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors group"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider">{currentLang.code}</span>
+              <span className={`material-symbols-outlined text-sm transition-transform ${isLangOpen ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+
+            {isLangOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsLangOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl py-2 z-50 animate-fade-in-up">
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => {
+                        setLang(l.code as Language);
+                        setIsLangOpen(false);
+                      }}
+                      className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${lang === l.code ? 'text-primary' : 'text-text-main dark:text-gray-300'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{l.flag}</span>
+                        <span className="text-sm font-bold">{l.label}</span>
+                      </div>
+                      <span className="text-[10px] font-black uppercase text-text-muted">{l.code}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <button
@@ -119,6 +157,22 @@ const Navbar: React.FC<{
               </div>
             )}
 
+            {/* Language Selection for Mobile */}
+            <div className="flex items-center gap-2 overflow-x-auto py-2 no-scrollbar">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => {
+                    setLang(l.code as Language);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`flex-shrink-0 flex items-center gap-3 px-4 py-2 rounded-xl transition-all font-bold ${lang === l.code ? 'bg-primary/10 text-primary ring-1 ring-primary/20' : 'bg-gray-50 dark:bg-gray-800 text-text-muted'}`}
+                >
+                  <span className="text-xs uppercase">{l.code}</span>
+                </button>
+              ))}
+            </div>
+
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.id}
@@ -135,22 +189,34 @@ const Navbar: React.FC<{
                 <>
                   <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-text-main dark:text-white font-bold py-2">
                     <span className="material-symbols-outlined">person</span>
-                    {lang === 'es' ? 'Mi Perfil' : 'My Profile'}
+                    {{
+                      es: 'Mi Perfil', en: 'My Profile', it: 'Il mio profilo', fr: 'Mon profil', de: 'Mein Profil'
+                    }[lang]}
                   </Link>
                   <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="flex items-center gap-3 text-red-500 font-bold py-2 w-full text-left">
                     <span className="material-symbols-outlined">logout</span>
-                    {lang === 'es' ? 'Cerrar Sesión' : 'Sign Out'}
+                    {{
+                      es: 'Cerrar Sesión', en: 'Sign Out', it: 'Disconnettersi', fr: 'Se déconnecter', de: 'Abmelden'
+                    }[lang]}
                   </button>
                 </>
               ) : (
                 <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-text-main dark:text-white font-bold py-2">
                   <span className="material-symbols-outlined">login</span>
-                  {lang === 'es' ? 'Iniciar Sesión' : 'Sign In'}
+                  {{
+                    es: 'Iniciar Sesión', en: 'Sign In', it: 'Accedi', fr: 'Se connecter', de: 'Anmelden'
+                  }[lang]}
                 </Link>
               )}
             </div>
             <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="h-12 w-full flex items-center justify-center bg-primary text-white rounded-lg font-bold">
-              {lang === 'es' ? 'Reservar Ahora' : 'Book Now'}
+              {{
+                es: 'Reservar Ahora',
+                en: 'Book Now',
+                it: 'Prenota Ora',
+                fr: 'Réserver Maintenant',
+                de: 'Jetzt Buchen'
+              }[lang]}
             </Link>
           </div>
         </div>
@@ -170,9 +236,13 @@ const Footer: React.FC<{ lang: Language }> = ({ lang }) => {
               <span className="text-xl font-black">La Barrosa</span>
             </div>
             <p className="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
-              {lang === 'es'
-                ? 'Tu hogar lejos de casa en la Costa de la Luz. Disfruta de una experiencia única con todas las comodidades.'
-                : 'Your home away from home in Costa de la Luz. Enjoy a unique experience with all the comforts.'}
+              {{
+                es: 'Tu hogar lejos de casa en la Costa de la Luz. Disfruta de una experiencia única con todas las comodidades.',
+                en: 'Your home away from home in Costa de la Luz. Enjoy a unique experience with all the comforts.',
+                it: 'La tua casa lontano da casa nella Costa de la Luz. Goditi un\'esperienza unica con tutti i comfort.',
+                fr: 'Votre chez-vous loin de chez vous sur la Costa de la Luz. Vivez une expérience unique avec tout le confort.',
+                de: 'Ihr zweites Zuhause an der Costa de la Luz. Genießen Sie ein einzigartiges Erlebnis mit allem Komfort.'
+              }[lang]}
             </p>
             <div className="flex gap-4">
               {['public', 'photo_camera', 'share'].map(icon => (
@@ -183,43 +253,43 @@ const Footer: React.FC<{ lang: Language }> = ({ lang }) => {
             </div>
           </div>
           <div>
-            <h4 className="font-bold mb-4">{lang === 'es' ? 'Explora' : 'Explore'}</h4>
+            <h4 className="font-bold mb-4">{{ es: 'Explora', en: 'Explore', it: 'Esplora', fr: 'Explorer', de: 'Erkunden' }[lang]}</h4>
             <ul className="space-y-2 text-sm text-text-muted dark:text-gray-400">
-              <li><Link to="/apartment" className="hover:text-primary">El Apartamento</Link></li>
-              <li><Link to="/services" className="hover:text-primary">Servicios</Link></li>
-              <li><Link to="/experiences" className="hover:text-primary">Experiencias</Link></li>
-              <li><Link to="/contact" className="hover:text-primary">Ubicación</Link></li>
+              <li><Link to="/apartment" className="hover:text-primary">{{ es: 'El Apartamento', en: 'The Apartment', it: 'L\'appartamento', fr: 'L\'appartement', de: 'Das Apartment' }[lang]}</Link></li>
+              <li><Link to="/services" className="hover:text-primary">{{ es: 'Servicios', en: 'Services', it: 'Servizi', fr: 'Services', de: 'Dienstleistungen' }[lang]}</Link></li>
+              <li><Link to="/experiences" className="hover:text-primary">{{ es: 'Experiencias', en: 'Experiences', it: 'Esperienze', fr: 'Expériences', de: 'Erlebnisse' }[lang]}</Link></li>
+              <li><Link to="/contact" className="hover:text-primary">{{ es: 'Ubicación', en: 'Location', it: 'Posizione', fr: 'Emplacement', de: 'Standort' }[lang]}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold mb-4">{lang === 'es' ? 'Legal' : 'Legal'}</h4>
+            <h4 className="font-bold mb-4">{{ es: 'Legal', en: 'Legal', it: 'Legale', fr: 'Juridique', de: 'Rechtliches' }[lang]}</h4>
             <ul className="space-y-2 text-sm text-text-muted dark:text-gray-400">
-              <li><Link to="/rules" className="hover:text-primary">Normas</Link></li>
-              <li><Link to="/booking" className="hover:text-primary">Condiciones</Link></li>
-              <li><button className="hover:text-primary text-left">Privacidad</button></li>
-              <li><button className="hover:text-primary text-left">Cookies</button></li>
+              <li><Link to="/rules" className="hover:text-primary">{{ es: 'Normas', en: 'Rules', it: 'Regole', fr: 'Règles', de: 'Regeln' }[lang]}</Link></li>
+              <li><Link to="/booking" className="hover:text-primary">{{ es: 'Condiciones', en: 'Conditions', it: 'Condizioni', fr: 'Conditions', de: 'Bedingungen' }[lang]}</Link></li>
+              <li><button className="hover:text-primary text-left">{{ es: 'Privacidad', en: 'Privacy', it: 'Privacy', fr: 'Confidentialité', de: 'Datenschutz' }[lang]}</button></li>
+              <li><button className="hover:text-primary text-left">{{ es: 'Cookies', en: 'Cookies', it: 'Cookie', fr: 'Cookies', de: 'Cookies' }[lang]}</button></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold mb-4">{lang === 'es' ? 'Contacto' : 'Contact'}</h4>
+            <h4 className="font-bold mb-4">{{ es: 'Contacto', en: 'Contact', it: 'Contatto', fr: 'Contact', de: 'Kontakt' }[lang]}</h4>
             <ul className="space-y-3 text-sm text-text-muted dark:text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">location_on</span>
-                <span>Calle La Barrosa 12, Chiclana</span>
+                <span>Av. de los Pescadores, 16, 11139, Chiclana</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px]">call</span>
-                <span>+34 956 123 456</span>
+                <span>+34 601 26 04 80</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px]">mail</span>
-                <span>hola@labarrosa.com</span>
+                <span>apartamentoplayalabarrosa16@gmail.com</span>
               </li>
             </ul>
           </div>
         </div>
         <div className="pt-8 border-t border-gray-100 dark:border-gray-800 text-center text-xs text-text-muted">
-          © {new Date().getFullYear()} Apartamento La Barrosa. {lang === 'es' ? 'Todos los derechos reservados.' : 'All rights reserved.'}
+          © {new Date().getFullYear()} Apartamento La Barrosa. {{ es: 'Todos los derechos reservados.', en: 'All rights reserved.', it: 'Tutti i diritti riservati.', fr: 'Tous droits réservés.', de: 'Alle Rechte vorbehalten.' }[lang]}
         </div>
       </div>
     </footer>

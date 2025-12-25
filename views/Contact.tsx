@@ -5,10 +5,21 @@ import { supabase } from '../lib/supabase';
 const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+
+  const getInitialSubject = (l: Language) => {
+    return {
+      es: 'Consulta general',
+      en: 'General Inquiry',
+      it: 'Richiesta generale',
+      fr: 'Demande générale',
+      de: 'Allgemeine Anfrage'
+    }[l];
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: lang === 'es' ? 'Consulta general' : 'General Inquiry',
+    subject: getInitialSubject(lang),
     message: ''
   });
 
@@ -47,7 +58,13 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
     setIsSubmitting(false);
 
     if (supabaseError) {
-      alert(lang === 'es' ? 'Error al enviar el mensaje' : 'Error sending message');
+      alert({
+        es: 'Error al enviar el mensaje',
+        en: 'Error sending message',
+        it: 'Errore nell\'invio del messaggio',
+        fr: 'Erreur lors de l\'envoi du message',
+        de: 'Fehler beim Senden der Nachricht'
+      }[lang]);
       console.error(supabaseError);
       return;
     }
@@ -56,7 +73,7 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
     setFormData({
       name: '',
       email: '',
-      subject: lang === 'es' ? 'Consulta general' : 'General Inquiry',
+      subject: getInitialSubject(lang),
       message: ''
     });
     setTimeout(() => setSent(false), 5000);
@@ -76,7 +93,13 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
       address: "Dirección",
       phone: "Teléfono",
       findUs: "Estamos aquí",
-      googleMaps: "Abrir en Google Maps"
+      googleMaps: "Abrir en Google Maps",
+      replyTime: "Respuesta en menos de 24h",
+      subjects: {
+        general: "Consulta general",
+        booking: "Reserva",
+        technical: "Problema técnico"
+      }
     },
     en: {
       title: "Contact us",
@@ -91,7 +114,76 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
       address: "Address",
       phone: "Phone",
       findUs: "Find us here",
-      googleMaps: "Open in Google Maps"
+      googleMaps: "Open in Google Maps",
+      replyTime: "Reply in less than 24h",
+      subjects: {
+        general: "General Inquiry",
+        booking: "Booking",
+        technical: "Technical Issue"
+      }
+    },
+    it: {
+      title: "Contattaci",
+      subtitle: "Hai domande? Faccelo sapere. Prenota direttamente per evitare commissioni.",
+      sendMsg: "Inviaci un messaggio",
+      name: "Nome completo",
+      email: "Indirizzo e-mail",
+      subject: "Oggetto",
+      msg: "Messaggio",
+      send: "Invia messaggio",
+      success: "Messaggio inviato con successo!",
+      address: "Indirizzo",
+      phone: "Telefono",
+      findUs: "Siamo qui",
+      googleMaps: "Apri in Google Maps",
+      replyTime: "Risposta in meno di 24h",
+      subjects: {
+        general: "Richiesta generale",
+        booking: "Prenotazione",
+        technical: "Problema tecnico"
+      }
+    },
+    fr: {
+      title: "Contactez-nous",
+      subtitle: "Vous avez des questions ? Faites-le nous savoir. Réservez directement pour éviter les commissions.",
+      sendMsg: "Envoyez-nous un message",
+      name: "Nom complet",
+      email: "Adresse e-mail",
+      subject: "Objet",
+      msg: "Message",
+      send: "Envoyer le message",
+      success: "Message envoyé avec succès !",
+      address: "Adresse",
+      phone: "Téléphone",
+      findUs: "Nous sommes ici",
+      googleMaps: "Ouvrir dans Google Maps",
+      replyTime: "Réponse en moins de 24h",
+      subjects: {
+        general: "Demande générale",
+        booking: "Réservation",
+        technical: "Problème technique"
+      }
+    },
+    de: {
+      title: "Kontaktieren Sie uns",
+      subtitle: "Haben Sie Fragen? Lassen Sie es uns wissen. Buchen Sie direkt, um Provisionen zu sparen.",
+      sendMsg: "Senden Sie uns eine Nachricht",
+      name: "Vollständiger Name",
+      email: "E-Mail-Adresse",
+      subject: "Betreff",
+      msg: "Nachricht",
+      send: "Nachricht senden",
+      success: "Nachricht erfolgreich gesendet!",
+      address: "Adresse",
+      phone: "Telefon",
+      findUs: "Wir sind hier",
+      googleMaps: "In Google Maps öffnen",
+      replyTime: "Antwort in weniger als 24 Stunden",
+      subjects: {
+        general: "Allgemeine Anfrage",
+        booking: "Buchung",
+        technical: "Technisches Problem"
+      }
     }
   }[lang];
 
@@ -135,9 +227,9 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl h-14 px-5 focus:ring-2 focus:ring-primary/20"
               >
-                <option value={lang === 'es' ? 'Consulta general' : 'General Inquiry'}>{lang === 'es' ? 'Consulta general' : 'General Inquiry'}</option>
-                <option value={lang === 'es' ? 'Reserva' : 'Booking'}>{lang === 'es' ? 'Reserva' : 'Booking'}</option>
-                <option value={lang === 'es' ? 'Problema técnico' : 'Technical Issue'}>{lang === 'es' ? 'Problema técnico' : 'Technical Issue'}</option>
+                <option value={t.subjects.general}>{t.subjects.general}</option>
+                <option value={t.subjects.booking}>{t.subjects.booking}</option>
+                <option value={t.subjects.technical}>{t.subjects.technical}</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -154,7 +246,7 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
               <p className="text-xs text-text-muted flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-green-500 !text-sm">check_circle</span>
-                {lang === 'es' ? 'Respuesta en menos de 24h' : 'Reply in less than 24h'}
+                {t.replyTime}
               </p>
               <button
                 disabled={sent || isSubmitting}
@@ -192,6 +284,15 @@ const Contact: React.FC<{ lang: Language }> = ({ lang }) => {
                 <h4 className="font-bold mb-1">{t.phone}</h4>
                 <p className="text-sm text-text-muted dark:text-gray-400">+34 601 26 04 80</p>
                 <p className="text-[10px] text-primary font-bold uppercase mt-1">WhatsApp Disponible</p>
+              </div>
+            </div>
+            <div className="flex gap-6">
+              <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined">mail</span>
+              </div>
+              <div>
+                <h4 className="font-bold mb-1">{t.email}</h4>
+                <p className="text-sm text-text-muted dark:text-gray-400">apartamentoplayalabarrosa16@gmail.com</p>
               </div>
             </div>
           </div>
