@@ -185,8 +185,8 @@ const Rules: React.FC<{ lang: Language }> = ({ lang }) => {
             <div className="grid grid-cols-1 lg:grid-cols-12">
               <div className="lg:col-span-5 relative h-[400px] lg:h-auto bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-12">
                 <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="size-32 rounded-full bg-primary/20 text-primary flex items-center justify-center text-5xl font-black mb-6 border-4 border-white dark:border-gray-800 shadow-xl">
-                    A
+                  <div className="size-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-xl mb-6">
+                    <img src="/antonio.png" alt="Antonio" className="w-full h-full object-cover" />
                   </div>
                   <h3 className="text-3xl font-black mb-2 italic">Antonio</h3>
                   <div className="flex items-center gap-2 px-4 py-1.5 bg-green-500/10 text-green-600 rounded-full text-xs font-black uppercase tracking-widest border border-green-500/20">
