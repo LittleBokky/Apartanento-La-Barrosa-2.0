@@ -27,6 +27,14 @@ interface Message {
     message: string;
 }
 
+interface GalleryImage {
+    id: string;
+    url: string;
+    title_es: string;
+    title_en: string;
+    order: number;
+}
+
 const Profile: React.FC<{
     lang: Language,
     user: any,
@@ -110,7 +118,9 @@ const Profile: React.FC<{
             clickToBlock: "Haz clic en los días para bloquear/desbloquear su disponibilidad manualmente.",
             blocked: "Bloqueado",
             loading: "Cargando reservas...",
-            delete: "Eliminar"
+            delete: "Eliminar",
+            deleteAll: "Borrar todos los mensajes",
+            confirmDeleteAll: "¿Estás seguro de que deseas borrar TODOS los mensajes? Esta acción no se puede deshacer."
         },
         en: {
             title: "My Profile",
@@ -134,9 +144,22 @@ const Profile: React.FC<{
             clickToBlock: "Click on days to manually block/unblock their availability.",
             blocked: "Blocked",
             loading: "Loading bookings...",
-            delete: "Delete"
+            delete: "Delete",
+            deleteAll: "Delete all messages",
+            confirmDeleteAll: "Are you sure you want to delete ALL messages? This cannot be undone."
         }
     }[lang];
+
+    const handleDeleteAllMessages = async () => {
+        if (!window.confirm(t.confirmDeleteAll)) return;
+        const { error } = await supabase.from('contact_messages').delete().neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+        if (error) {
+            alert(lang === 'es' ? 'Error al eliminar los mensajes' : 'Error deleting messages');
+            console.error(error);
+        } else {
+            fetchMessages();
+        }
+    };
 
     return (
         <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 animate-fade-in-up">
@@ -273,10 +296,21 @@ const Profile: React.FC<{
                     {/* Admin Contact Messages */}
                     {isAdmin && (
                         <div>
-                            <h3 className="text-2xl font-black mb-6 flex items-center gap-3">
-                                <span className="material-symbols-outlined text-purple-600">mail</span>
-                                {t.messages}
-                            </h3>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-black flex items-center gap-3">
+                                    <span className="material-symbols-outlined text-purple-600">mail</span>
+                                    {t.messages}
+                                </h3>
+                                {messages.length > 0 && (
+                                    <button
+                                        onClick={handleDeleteAllMessages}
+                                        className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">delete_sweep</span>
+                                        {t.deleteAll}
+                                    </button>
+                                )}
+                            </div>
 
                             <div className="space-y-6">
                                 {messages.length === 0 ? (
@@ -297,7 +331,8 @@ const Profile: React.FC<{
                                                 </span>
                                                 <button
                                                     onClick={() => handleDeleteMessage(msg.id)}
-                                                    className="text-red-500 hover:text-red-700 transition-colors"
+                                                    className="text-red-500 hover:text-red-700 p-1 transition-colors"
+                                                    title={t.delete}
                                                 >
                                                     <span className="material-symbols-outlined text-sm">delete</span>
                                                 </button>

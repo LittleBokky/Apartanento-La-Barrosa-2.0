@@ -388,7 +388,7 @@ const App: React.FC = () => {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home lang={lang} />} />
-            <Route path="/apartment" element={<Apartment lang={lang} />} />
+            <Route path="/apartment" element={<Apartment lang={lang} user={user} />} />
             <Route path="/services" element={<Services lang={lang} />} />
             <Route path="/experiences" element={<Experiences lang={lang} />} />
             <Route path="/rules" element={<Rules lang={lang} />} />
