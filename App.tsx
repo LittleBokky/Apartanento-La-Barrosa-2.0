@@ -15,6 +15,7 @@ import Booking from './views/Booking';
 import Login from './views/Login';
 import Register from './views/Register';
 import Profile from './views/Profile';
+import ForgotPassword from './views/ForgotPassword';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -466,6 +467,7 @@ const App: React.FC = () => {
             <Route path="/booking" element={<Booking lang={lang} blockedDays={blockedDays} user={user} onBookingSuccess={fetchBlockedDays} />} />
             <Route path="/login" element={<Login lang={lang} onLogin={handleLogin} />} />
             <Route path="/register" element={<Register lang={lang} />} />
+            <Route path="/forgot-password" element={<ForgotPassword lang={lang} />} />
             <Route path="/profile" element={<Profile lang={lang} user={user} onLogout={handleLogout} blockedDays={blockedDays} setBlockedDays={handleBlockedDaysUpdate} onRefresh={fetchBlockedDays} />} />
           </Routes>
         </main>
